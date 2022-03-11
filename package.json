@@ -1,0 +1,18 @@
+{
+  "name": "Qotoof",
+  "version": "1.0.0",
+  "description": "Qotoof organization web app",
+  "main": "app.js",
+  "author": "Karim Ater",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.2",
+    "express": "^4.17.3"
+  }
+}
