@@ -1,13 +1,13 @@
 const express = require('express')
 const router = express.Router();
 const path= require('path');
-const caseController = require('../controllers/caseController');
-// const postFamily = require('../controllers/caseController');
+const beneficiaryController = require('../controllers/beneficiaryController');
+// const postFamily = require('../controllers/beneficiaryController');
 
 
 
-router.post("/case", caseController.postCase);
-router.get("/cases", caseController.getCases);
+router.post("/beneficiary", beneficiaryController.postBeneficiary);
+router.get("/beneficiaryList", beneficiaryController.getBeneficiaries);
 
 router.get('/favicon.ico',(req,res,next)=>{
     res.sendStatus(204);

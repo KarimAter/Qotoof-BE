@@ -1,7 +1,7 @@
 const http = require('http')
 const express =require('express')
 const bodyParser= require('body-parser')
-const adminRoute = require("./routes/caseRoute");
+const adminRoute = require("./routes/beneficiaryRoute");
 
 const app=express();
 
