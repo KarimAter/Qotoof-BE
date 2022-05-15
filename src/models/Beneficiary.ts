@@ -1,28 +1,24 @@
-// interface IBenficiary {
+interface IBeneficiary {
+  name: string;
+}
 
-//     benName:string;
-// }
+const beneficiaryList:IBeneficiary[]=[];
 
-// const beneficiaryList:IBenficiary[]=[];
-
-const beneficiaryList:Benificiary[]=[];
-
-class Benificiary  {
-    benName: string;
+class Beneficiary implements IBeneficiary {
+    name: string;
     
     constructor(name:string){
-        this.benName=name;
+        this.name=name;
     }
     
-
     save(){
         beneficiaryList.push(this);
     }
 
 
-    static fetchCases():Benificiary[]{
+    static fetchCases():IBeneficiary[]{
         return beneficiaryList
     }
 }
 
-export default Benificiary;
+export default Beneficiary;
