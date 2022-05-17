@@ -7,8 +7,9 @@ import path from 'path';
 // const postFamily = require('../controllers/beneficiaryController');
 
 
-
-router.post("/beneficiary", postBeneficiary);
+// creating a new beneficiary
+router.post("/addBenefciary", postBeneficiary);
+// get the beneficiary list
 router.get("/beneficiaryList", getBeneficiaries);
 
 router.get('/favicon.ico',(req,res,next)=>{

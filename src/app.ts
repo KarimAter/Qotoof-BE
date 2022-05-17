@@ -22,6 +22,6 @@ app.use((req,res,next)=>{
     next()
 })
 
-app.use(adminRoute);
+app.use('/beneficiary',adminRoute);
 
 app.listen(8000);
