@@ -3,12 +3,17 @@ const router = Router();
 import path from 'path';
 // const path= require('path');
 // const beneficiaryController = require('../controllers/beneficiaryController');
- import { postBeneficiary, getBeneficiaries } from '../controllers/beneficiaryController'
+ import { postBeneficiary, getBeneficiaries,editBeneficiary, deleteBeneficiary } from '../controllers/beneficiaryController'
 // const postFamily = require('../controllers/beneficiaryController');
 
 
 // creating a new beneficiary
 router.post("/addBenefciary", postBeneficiary);
+
+// Editing an existing  beneficiary
+router.put("/editBeneficiary/:beneficiaryName", editBeneficiary);
+// Deleting an existing  beneficiary
+router.delete("/deleteBeneficiary/:beneficiaryName", deleteBeneficiary);
 // get the beneficiary list
 router.get("/beneficiaryList", getBeneficiaries);
 
