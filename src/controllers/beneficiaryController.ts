@@ -2,15 +2,17 @@ import { NextFunction, Request, Response } from 'express';
 import Beneficiary from '../models/Beneficiary';
 
 const getBeneficiaries = (req: Request, res: Response, next: NextFunction) => {
-  res.json(Beneficiary.fetchCases());
+  Beneficiary.fetchCases().then(([RowDataPacket]) => res.json(RowDataPacket));
 };
 const postBeneficiary = (req: Request, res: Response, next: NextFunction) => {
   const beneficiary = new Beneficiary(req.body.beneficiaryName);
-  beneficiary.save();
-  res.json({
-    message: `Beneficiary is added successfully`,
-    beneficiaryName: beneficiary.name,
-  });
+  beneficiary
+    .save()
+    .then(() => res.json({
+      message: `Beneficiary is added successfully`,
+      beneficiaryName: beneficiary.name,
+    }))
+    .catch((error) => console.log(error));
 };
 
 const editBeneficiary = (req: Request, res: Response, next: NextFunction) => {

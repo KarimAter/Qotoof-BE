@@ -1,3 +1,5 @@
+import db from '../utils/databaseConnector';
+
 interface IBeneficiary {
   name: string;
 }
@@ -12,7 +14,10 @@ class Beneficiary implements IBeneficiary {
   }
 
   save() {
-    beneficiaryList.push(this);
+    return db.execute(`INSERT INTO Beneficiaries (id,name) values (?,?)`, [
+      1000 * Math.random(),
+      this.name,
+    ]);
   }
 
   static editBeneficiary(currentName: string, targetName: string): string {
@@ -36,8 +41,9 @@ class Beneficiary implements IBeneficiary {
     return 'Not found';
   }
 
-  static fetchCases(): IBeneficiary[] {
-    return beneficiaryList;
+  static fetchCases() {
+    // let beneficiaryList:IBeneficiary;
+    return db.execute('Select * from Beneficiaries;');
   }
 }
 
