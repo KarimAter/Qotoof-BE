@@ -1,11 +1,7 @@
 import { Router } from 'express';
 import path from 'path';
-import {
-  postBeneficiary,
-  getBeneficiaries,
-  editBeneficiary,
-  deleteBeneficiary,
-} from '../controllers/beneficiaryController';
+// import getBeneficiaries from '../controllers/beneficiaryController';
+import { postBeneficiary } from '../controllers/beneficiaryController';
 
 const router = Router();
 
@@ -14,14 +10,14 @@ const router = Router();
 // const postFamily = require('../controllers/beneficiaryController');
 
 // creating a new beneficiary
-router.post('/addBenefciary', postBeneficiary);
+router.post('/', postBeneficiary);
 
-// Editing an existing  beneficiary
-router.put('/editBeneficiary/:beneficiaryName', editBeneficiary);
-// Deleting an existing  beneficiary
-router.delete('/deleteBeneficiary/:beneficiaryName', deleteBeneficiary);
+// // Editing an existing  beneficiary
+// router.put('/:beneficiaryName', editBeneficiary);
+// // Deleting an existing  beneficiary
+// router.delete('/:beneficiaryName', deleteBeneficiary);
 // get the beneficiary list
-router.get('/beneficiaryList', getBeneficiaries);
+// router.get('/beneficiaryList', getBeneficiaries);
 
 router.get('/favicon.ico', (req, res) => {
   res.sendStatus(204);
