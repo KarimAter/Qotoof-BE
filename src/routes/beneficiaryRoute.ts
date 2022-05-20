@@ -1,7 +1,12 @@
 import { Router } from 'express';
 import path from 'path';
 // import getBeneficiaries from '../controllers/beneficiaryController';
-import { postBeneficiary } from '../controllers/beneficiaryController';
+import {
+  deleteBeneficiary,
+  editBeneficiary,
+  getBeneficiaries,
+  postBeneficiary,
+} from '../controllers/beneficiaryController';
 
 const router = Router();
 
@@ -10,9 +15,13 @@ const router = Router();
 // const postFamily = require('../controllers/beneficiaryController');
 
 // creating a new beneficiary
-router.post('/', postBeneficiary);
+router
+  .post('/', postBeneficiary)
+  .get('/', getBeneficiaries)
+  .put('/', editBeneficiary)
+  .delete('/', deleteBeneficiary);
 
-// // Editing an existing  beneficiary
+// Editing an existing  beneficiary
 // router.put('/:beneficiaryName', editBeneficiary);
 // // Deleting an existing  beneficiary
 // router.delete('/:beneficiaryName', deleteBeneficiary);

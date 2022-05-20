@@ -24,7 +24,7 @@
         "allowTemplateLiterals": true
       }
     ],
-    "indent": "warn",
-    "@typescript-eslint/indent": ["warn"]
+    "indent": "off",
+    "@typescript-eslint/indent": ["off"]
   }
 }
