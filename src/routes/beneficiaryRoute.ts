@@ -8,40 +8,40 @@ import {
   postBeneficiary,
 } from '../controllers/beneficiaryController';
 
-const router = Router();
+const benRouter = Router();
 
 // const path= require('path');
 // const beneficiaryController = require('../controllers/beneficiaryController');
 // const postFamily = require('../controllers/beneficiaryController');
 
 // creating a new beneficiary
-router
+benRouter
   .post('/', postBeneficiary)
   .get('/', getBeneficiaries)
   .put('/', editBeneficiary)
   .delete('/', deleteBeneficiary);
 
 // Editing an existing  beneficiary
-// router.put('/:beneficiaryName', editBeneficiary);
+// benRouter.put('/:beneficiaryName', editBeneficiary);
 // // Deleting an existing  beneficiary
-// router.delete('/:beneficiaryName', deleteBeneficiary);
+// benRouter.delete('/:beneficiaryName', deleteBeneficiary);
 // get the beneficiary list
-// router.get('/beneficiaryList', getBeneficiaries);
+// benRouter.get('/beneficiaryList', getBeneficiaries);
 
-router.get('/favicon.ico', (req, res) => {
-  res.sendStatus(204);
-});
+// benRouter.get('/favicon.ico', (req, res) => {
+//   res.sendStatus(204);
+// });
 
-router.use('/file', (req, res) => {
-  console.log(req.body);
-  res.send(`<html><h4>File Page</h4></html>`);
-});
+// benRouter.use('/file', (req, res) => {
+//   console.log(req.body);
+//   res.send(`<html><h4>File Page</h4></html>`);
+// });
 
-router.use('/', (req, res) => {
-  // res.setHeader('Content-Type','application/json')
-  // res.sendFile(path.join(__dirname,'../','files','lav3.jpg'))
-  // gets the root directory
-  res.sendFile(path.join(path.join(__dirname), '../', 'files', 'lav3.jpg'));
-});
+// benRouter.use('/', (req, res) => {
+//   // res.setHeader('Content-Type','application/json')
+//   // res.sendFile(path.join(__dirname,'../','files','lav3.jpg'))
+//   // gets the root directory
+//   res.sendFile(path.join(path.join(__dirname), '../', 'files', 'lav3.jpg'));
+// });
 
-export default router;
+export default benRouter;

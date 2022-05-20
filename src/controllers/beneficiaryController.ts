@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-param-reassign */
 import { NextFunction, Request, Response } from 'express';
-import { where } from 'sequelize/types';
 import Beneficiary, { IBeneficiary } from '../models/Beneficiary';
 
 const getBeneficiaries = (req: Request, res: Response, next: NextFunction) => {

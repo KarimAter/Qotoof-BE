@@ -6,7 +6,8 @@ yarn add @types/express --dev
 
 import express from 'express';
 import bodyParser from 'body-parser';
-import adminRoute from './routes/beneficiaryRoute';
+import benRouter from './routes/beneficiaryRoute';
+import userRoute from './routes/userRoute';
 import sequelize from './utils/databaseConnector';
 import Beneficiary from './models/Beneficiary';
 
@@ -31,4 +32,5 @@ sequelize
     app.listen(8000);
   })
   .catch((err) => console.log(err));
-app.use('/beneficiary', adminRoute);
+app.use('/user', userRoute);
+app.use('/beneficiary', benRouter);
