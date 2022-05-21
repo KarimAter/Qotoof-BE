@@ -3,3 +3,7 @@
 
 yarn-error.log*
 
+dist/routes/beneficiaryRoute.js
+dist/models/Beneficiary.js
+dist/controllers/beneficiaryController.js
+dist/app.js
