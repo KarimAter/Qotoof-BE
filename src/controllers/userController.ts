@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import User, { IUser } from '../models/User';
+import User, { IUser } from '../models/user';
 
 const postUser = (req: Request, res: Response, next: NextFunction) => {
   const {

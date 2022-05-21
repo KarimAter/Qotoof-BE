@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-param-reassign */
 import { NextFunction, Request, Response } from 'express';
-import Beneficiary, { IBeneficiary } from '../models/Beneficiary';
+import Beneficiary, { IBeneficiary } from '../models/beneficiary';
 
 const getBeneficiaries = (req: Request, res: Response, next: NextFunction) => {
   Beneficiary.findAll()

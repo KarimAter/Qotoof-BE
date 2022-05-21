@@ -3,7 +3,7 @@ import { Sequelize, DataType, Model } from 'sequelize-typescript';
 import { DataTypes, Optional } from 'sequelize/types';
 import DonorRole from '../utils/Constants';
 import sequelize from '../utils/databaseConnector';
-import { IUser } from './User';
+import { IUser } from './user';
 
 export interface IDonor {
   id: number;

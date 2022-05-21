@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import Donor, { IDonor } from '../models/Donor';
+import Donor, { IDonor } from '../models/donor';
 
 const postDonor = (req: Request, res: Response, next: NextFunction) => {
   const { name, referal } = req.body as IDonor;
