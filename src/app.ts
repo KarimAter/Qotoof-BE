@@ -9,7 +9,7 @@ import bodyParser from 'body-parser';
 import benRouter from './routes/beneficiaryRoute';
 import userRoute from './routes/userRoute';
 import sequelize from './utils/databaseConnector';
-import Beneficiary from './models/Beneficiary';
+import donorRouter from './routes/donorRoute';
 
 const app = express();
 
@@ -32,5 +32,6 @@ sequelize
     app.listen(8000);
   })
   .catch((err) => console.log(err));
+app.use('/donor', donorRouter);
 app.use('/user', userRoute);
 app.use('/beneficiary', benRouter);

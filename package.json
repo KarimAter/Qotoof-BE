@@ -6,7 +6,7 @@
   "author": "Karim Ater",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon",
+    "start": "tsc && nodemon",
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
