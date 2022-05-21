@@ -1,24 +1,42 @@
 import { NextFunction, Request, Response } from 'express';
-import Donation, { IDonation } from '../models/donation';
+import { IDonation } from '../models/donation';
+import Donor from '../models/donor';
 
-const postDonation = (req: Request, res: Response, next: NextFunction) => {
+const postDonation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { donation, donorId } = req.body as {
+    donation: IDonation;
+    donorId: number;
+  };
   const {
-       amount, category, comment, date, donor, payment, status,
-    } = req.body as IDonation;
-  Donation.create({
+ amount, category, comment, date, payment, status,
+} = donation;
+
+  const donorName = await Donor.findByPk(donorId);
+  const donor = donorName ? donorName.name : '';
+
+  await donorName?.createDonation({
     amount,
     category,
     comment,
     date,
-    donor,
     payment,
+    donor,
     status,
-  })
-    .then((result) => {
-      console.log(result);
-      res.json({ message: ` Donation ${result.id} added successfully` });
-    })
-    .catch((err) => console.log(err));
+  });
+
+  const ds = await donorName?.getDonations();
+
+  const x = ds?.[0];
+  console.log('donation[0]:', x);
+
+  const y = await x?.getDonor();
+
+  console.log('getDonor:', y);
+  res.json({ message: ` Donation  added successfully` });
 };
 
 export default postDonation;

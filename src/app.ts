@@ -2,6 +2,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import sequelize from './utils/databaseConnector';
 import router from './routes/adminRoute';
+import Donor from './models/donor';
+import Donation from './models/donation';
 
 const app = express();
 

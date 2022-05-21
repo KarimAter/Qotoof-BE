@@ -1,24 +1,33 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
-import { Sequelize, DataType, Model } from 'sequelize-typescript';
-import { DataTypes, Optional } from 'sequelize/types';
-import DonorRole from '../utils/Constants';
+import { DataType, Model } from 'sequelize-typescript';
+import {
+  HasManyCreateAssociationMixin,
+  HasManyGetAssociationsMixin,
+  Optional,
+} from 'sequelize/types';
 import sequelize from '../utils/databaseConnector';
+import Donation, { DonationInstance } from './donation';
 import { IUser } from './user';
 
 export interface IDonor {
-  id: number;
+  donorId: number;
   name: string;
   referal: IUser;
 }
 
-interface DonorCreationAttributes extends Optional<IDonor, 'id'> {}
+interface DonorCreationAttributes extends Optional<IDonor, 'donorId'> {}
 
-interface DonorInstance extends Model<IDonor, DonorCreationAttributes>, IDonor {
+export interface DonorInstance
+  extends Model<IDonor, DonorCreationAttributes>,
+    IDonor {
   id: number;
+  name: string;
+  createDonation: HasManyCreateAssociationMixin<DonationInstance, 'donationId'>;
+  getDonations: HasManyGetAssociationsMixin<DonationInstance>;
 }
 
 const Donor = sequelize.define<DonorInstance>('Donor', {
-  id: {
+  donorId: {
     type: DataType.INTEGER,
     autoIncrement: true,
     allowNull: false,
@@ -26,6 +35,25 @@ const Donor = sequelize.define<DonorInstance>('Donor', {
   },
   name: { type: DataType.STRING },
   referal: { type: DataType.STRING },
+});
+Donor.hasMany(Donation, {
+  /*
+    You can omit the sourceKey property
+    since by default sequelize will use the primary key defined
+    in the model - But I like to be explicit
+  */
+  // sourceKey: 'sdsd',
+  // foreignKey: 'donId',
+  // as: 'donations',
+});
+
+Donation.belongsTo(Donor, {
+  /*
+      You can omit the sourceKey property
+      since by default sequelize will use the primary key defined
+      in the model - But I like to be explicit
+    */
+  // targetKey: 'donorId',
 });
 
 export default Donor;

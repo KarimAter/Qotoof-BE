@@ -1,31 +1,34 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-empty-interface */
-import { Sequelize, DataType, Model } from 'sequelize-typescript';
-import { DataTypes, Optional } from 'sequelize/types';
-import DonationRole from '../utils/Constants';
+import { DataType, Model } from 'sequelize-typescript';
+import { BelongsToGetAssociationMixin, Optional } from 'sequelize/types';
 import sequelize from '../utils/databaseConnector';
-import { IDonor } from './donor';
+import Donor, { DonorInstance, IDonor } from './donor';
 
 export interface IDonation {
-  id: number;
+  donationId: number;
   date: string;
   amount: number;
   category: string;
   status: string;
   payment: string;
   comment: string;
-  donor: IDonor;
+  donor: string;
 }
 
-interface DonationCreationAttributes extends Optional<IDonation, 'id'> {}
+interface DonationCreationAttributes
+  extends Optional<IDonation, 'donationId'> {}
 
-interface DonationInstance
+export interface DonationInstance
   extends Model<IDonation, DonationCreationAttributes>,
     IDonation {
   id: number;
+  donor: string;
+  getDonor: BelongsToGetAssociationMixin<DonorInstance>;
 }
 
 const Donation = sequelize.define<DonationInstance>('Donation', {
-  id: {
+  donationId: {
     type: DataType.INTEGER,
     autoIncrement: true,
     allowNull: false,
