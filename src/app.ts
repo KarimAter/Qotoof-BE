@@ -1,15 +1,7 @@
-/*
-tsc --init
-yarn add @types/node --dev
-yarn add @types/express --dev
-*/
-
 import express from 'express';
 import bodyParser from 'body-parser';
-import benRouter from './routes/beneficiaryRoute';
-import userRoute from './routes/userRoute';
 import sequelize from './utils/databaseConnector';
-import donorRouter from './routes/donorRoute';
+import router from './routes/adminRoute';
 
 const app = express();
 
@@ -32,6 +24,5 @@ sequelize
     app.listen(8000);
   })
   .catch((err) => console.log(err));
-app.use('/donor', donorRouter);
-app.use('/user', userRoute);
-app.use('/beneficiary', benRouter);
+
+app.use(router);
