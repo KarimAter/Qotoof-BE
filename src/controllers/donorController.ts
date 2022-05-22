@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { IDonor } from '../models/donor';
-import { prismaClient } from '../utils/databaseConnector';
+import prismaClient from '../utils/databaseConnector';
 
 const postDonor = async (req: Request, res: Response, next: NextFunction) => {
   const { name, referral } = req.body as IDonor;

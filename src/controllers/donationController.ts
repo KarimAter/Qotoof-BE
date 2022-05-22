@@ -1,8 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import { IDonation } from '../models/donation';
-import Donor from '../models/donor';
-import { prismaClient } from '../utils/databaseConnector';
+import prismaClient from '../utils/databaseConnector';
 
 const postDonation = async (
   req: Request,
@@ -32,28 +31,6 @@ const postDonation = async (
       }
     }
   }
-  // const donorName = await Donor.findByPk(donorId);
-  // const donor = donorName ? donorName.name : '';
-
-  // await donorName?.createDonation({
-  //   amount,
-  //   category,
-  //   comment,
-  //   date,
-  //   payment,
-  //   donor,
-  //   status,
-  // });
-
-  // const ds = await donorName?.getDonations();
-
-  // const x = ds?.[0];
-  // console.log('donation[0]:', x);
-
-  // const y = await x?.getDonor();
-
-  // console.log('getDonor:', y);
-  // res.json({ message: ` Donation  added successfully` });
 };
 
 export default postDonation;

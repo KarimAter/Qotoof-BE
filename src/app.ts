@@ -20,11 +20,5 @@ app.use((req, res, next) => {
   next();
 });
 
-// sequelize
-//   .sync()
-//   .then(() => {
-//   })
-//   .catch((err) => console.log(err));
-
 app.use(router);
 app.listen(8000);
