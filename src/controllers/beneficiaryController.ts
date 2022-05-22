@@ -5,13 +5,25 @@ import { NextFunction, Request, Response } from 'express';
 import Beneficiary, { IBeneficiary } from '../models/beneficiary';
 import { prismaClient } from '../utils/databaseConnector';
 
-const getBeneficiaries = (req: Request, res: Response, next: NextFunction) => {
-  Beneficiary.findAll()
-    .then((bens) => {
-      res.json(bens);
-    })
-    .catch((err) => console.log(err));
-  console.log(Beneficiary.getTableName());
+const getBeneficiaries = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const bens = await prismaClient.beneficiary.findMany();
+
+    res.json(bens);
+  } catch (error) {
+    console.log(error);
+  }
+
+  // Beneficiary.findAll()
+  //   .then((bens) => {
+  //     res.json(bens);
+  //   })
+  //   .catch((err) => console.log(err));
+  // console.log(Beneficiary.getTableName());
 };
 
 const getBeneficiary = (req: Request, res: Response, next: NextFunction) => {
@@ -32,48 +44,61 @@ const postBeneficiary = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { beneficiaryName } = req.body as IBeneficiary;
-
-  const ben = await prismaClient.beneficiary.create({
-    data: { name: beneficiaryName },
-  });
-
-  res.json(ben);
+  try {
+    const { beneficiaryName } = req.body as IBeneficiary;
+    const ben = await prismaClient.beneficiary.create({
+      data: { name: beneficiaryName },
+    });
+    res.json(ben);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-const editBeneficiary = (req: Request, res: Response, next: NextFunction) => {
-  const { id, beneficiaryName } = req.body as IBeneficiary;
+const editBeneficiary = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { id, beneficiaryName }: IBeneficiary = req.body;
   const { targetName } = req.body;
 
-  Beneficiary.findByPk(id)
-    .then((ben) => {
-      if (ben) {
-        ben.beneficiaryName = targetName;
-        ben.save();
-        res.json({
-          beneficiary: ben,
-          message: `${beneficiaryName} has been updated to ${targetName}`,
-        });
-      } else {
-        res.json({ message: `Not found` });
-      }
-    })
-    .catch((err) => console.log(err));
+  try {
+    const updatedBen = await prismaClient.beneficiary.update({
+      where: { id },
+      data: { name: targetName },
+    });
+    res.json(updatedBen);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-const deleteBeneficiary = (req: Request, res: Response, next: NextFunction) => {
+const deleteBeneficiary = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { id } = req.body as IBeneficiary;
-  Beneficiary.findByPk(id)
-    .then((ben) => {
-      ben
-        ? res.json({
-            beneficiary: ben,
-            message: `${ben?.beneficiaryName} has been deleted`,
-          })
-        : res.json({ message: `Not found` });
-      ben?.destroy();
-    })
-    .catch((err) => console.log(err));
+
+  try {
+    const ben = await prismaClient.beneficiary.delete({ where: { id } });
+    res.json(ben);
+  } catch (error) {
+    console.log(error);
+  }
+
+  // Beneficiary.findByPk(id)
+  //   .then((ben) => {
+  //     ben
+  //       ? res.json({
+  //           beneficiary: ben,
+  //           message: `${ben?.beneficiaryName} has been deleted`,
+  //         })
+  //       : res.json({ message: `Not found` });
+  //     ben?.destroy();
+  //   })
+  //   .catch((err) => console.log(err));
 };
 
 export {
