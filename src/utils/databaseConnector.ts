@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client';
 import mysql from 'mysql2';
 import { Sequelize } from 'sequelize';
 
@@ -10,11 +11,6 @@ const sequelize = new Sequelize('Qutoof', 'root', 'admin', {
   timezone: '+02:00', // for writing to database
 });
 
-// const pool = mysql.createPool({
-//   host: 'localhost',
-//   user: 'root',
-//   database: 'Qutoof',
-//   password: 'admin',
-// });
+export const prismaClient = new PrismaClient();
 
 export default sequelize;

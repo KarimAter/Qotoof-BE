@@ -3,6 +3,7 @@
 /* eslint-disable no-param-reassign */
 import { NextFunction, Request, Response } from 'express';
 import Beneficiary, { IBeneficiary } from '../models/beneficiary';
+import { prismaClient } from '../utils/databaseConnector';
 
 const getBeneficiaries = (req: Request, res: Response, next: NextFunction) => {
   Beneficiary.findAll()
@@ -26,14 +27,18 @@ const getBeneficiary = (req: Request, res: Response, next: NextFunction) => {
     .catch((err) => console.log(err));
 };
 
-const postBeneficiary = (req: Request, res: Response, next: NextFunction) => {
+const postBeneficiary = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { beneficiaryName } = req.body as IBeneficiary;
-  Beneficiary.create({ beneficiaryName })
-    .then((resaaa) => {
-      console.log(resaaa);
-      res.json({ msg: `${beneficiaryName} added successfully` });
-    })
-    .catch((err) => console.log(err));
+
+  const ben = await prismaClient.beneficiary.create({
+    data: { name: beneficiaryName },
+  });
+
+  res.json(ben);
 };
 
 const editBeneficiary = (req: Request, res: Response, next: NextFunction) => {
