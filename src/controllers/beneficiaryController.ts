@@ -26,17 +26,17 @@ const getBeneficiaries = async (
   // console.log(Beneficiary.getTableName());
 };
 
-const getBeneficiary = (req: Request, res: Response, next: NextFunction) => {
+const getBeneficiary = async (req: Request, res: Response, next: NextFunction) => {
   const { id, beneficiaryName } = req.body as IBeneficiary;
 
-  Beneficiary.findByPk(id)
-    .then((beneficiary) => {
-      res.json({
-        beneficiary,
-        message: `${beneficiary?.beneficiaryName} is fetched`,
-      });
-    })
-    .catch((err) => console.log(err));
+  try {
+    const bens = await prismaClient.beneficiary.findUnique({
+      where: { id: Number(id) },
+    });
+    res.json(bens);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const postBeneficiary = async (
@@ -65,7 +65,7 @@ const editBeneficiary = async (
 
   try {
     const updatedBen = await prismaClient.beneficiary.update({
-      where: { id },
+      where: { id: Number(id) },
       data: { name: targetName },
     });
     res.json(updatedBen);

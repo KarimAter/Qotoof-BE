@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import { DataType, Model } from 'sequelize-typescript';
 import {
@@ -12,7 +13,7 @@ import { IUser } from './user';
 export interface IDonor {
   donorId: number;
   name: string;
-  referal: IUser;
+  referral: IUser;
 }
 
 interface DonorCreationAttributes extends Optional<IDonor, 'donorId'> {}
@@ -34,7 +35,7 @@ const Donor = sequelize.define<DonorInstance>('Donor', {
     primaryKey: true,
   },
   name: { type: DataType.STRING },
-  referal: { type: DataType.STRING },
+  referral: { type: DataType.STRING },
 });
 Donor.hasMany(Donation, {
   /*

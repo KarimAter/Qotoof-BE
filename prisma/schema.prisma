@@ -17,3 +17,33 @@ model Beneficiary {
   id   Int    @id @default(autoincrement())
   name String @unique
 }
+
+model Donor {
+  id       Int        @id @unique @default(autoincrement())
+  name     String
+  referral String?
+  Donation Donation[]
+}
+
+model Donation {
+  id       Int     @id @unique @default(autoincrement())
+  amount   Float
+  category String?
+  donor    Donor   @relation(fields: [donorId], references: [id]) // fields the foregin key, reference the model key
+  donorId  Int
+}
+
+model User {
+  id       Int      @id @unique @default(autoincrement())
+  name     String
+  email    String?
+  password String?
+  role     UserRole
+}
+
+enum UserRole {
+  SUPER
+  ADMIN
+  EDITOR
+  GUEST
+}
