@@ -5,6 +5,7 @@ import {
   deleteBeneficiary,
   editBeneficiary,
   getBeneficiaries,
+  getBeneficiary,
   postBeneficiary,
 } from '../controllers/beneficiaryController';
 
@@ -16,8 +17,9 @@ const benRouter = Router();
 
 // creating a new beneficiary
 benRouter
-  .post('/', postBeneficiary)
+  .get('/:id', getBeneficiary)
   .get('/', getBeneficiaries)
+  .post('/', postBeneficiary)
   .put('/', editBeneficiary)
   .delete('/', deleteBeneficiary);
 

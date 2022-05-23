@@ -1,18 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import { IBeneficiary } from '../models/beneficiary';
 import prismaClient from '../utils/databaseConnector';
+import prismaOperation from '../utils/helperFunctions';
 
 const getBeneficiaries = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    const bens = await prismaClient.beneficiary.findMany();
-    res.json(bens);
-  } catch (error) {
-    console.log(error);
-  }
+  prismaOperation(() => prismaClient.beneficiary.findMany(), res);
 };
 
 const getBeneficiary = async (
@@ -20,16 +16,15 @@ const getBeneficiary = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { id, beneficiaryName } = req.body as IBeneficiary;
+  const { id, beneficiaryName } = req.params;
 
-  try {
-    const bens = await prismaClient.beneficiary.findUnique({
-      where: { id: Number(id) },
-    });
-    res.json(bens);
-  } catch (error) {
-    console.log(error);
-  }
+  prismaOperation(
+    () =>
+      prismaClient.beneficiary.findUnique({
+        where: { id: Number(id) },
+      }),
+    res,
+  );
 };
 
 const postBeneficiary = async (
@@ -37,15 +32,14 @@ const postBeneficiary = async (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    const { beneficiaryName } = req.body as IBeneficiary;
-    const ben = await prismaClient.beneficiary.create({
-      data: { name: beneficiaryName },
-    });
-    res.json(ben);
-  } catch (error) {
-    console.log(error);
-  }
+  const { beneficiaryName } = req.body as IBeneficiary;
+  prismaOperation(
+    () =>
+      prismaClient.beneficiary.create({
+        data: { name: beneficiaryName },
+      }),
+    res,
+  );
 };
 
 const editBeneficiary = async (
@@ -56,15 +50,14 @@ const editBeneficiary = async (
   const { id, beneficiaryName }: IBeneficiary = req.body;
   const { targetName } = req.body;
 
-  try {
-    const updatedBen = await prismaClient.beneficiary.update({
-      where: { id: Number(id) },
-      data: { name: targetName },
-    });
-    res.json(updatedBen);
-  } catch (error) {
-    console.log(error);
-  }
+  prismaOperation(
+    () =>
+      prismaClient.beneficiary.update({
+        where: { id: Number(id) },
+        data: { name: targetName },
+      }),
+    res,
+  );
 };
 
 const deleteBeneficiary = async (
@@ -73,12 +66,15 @@ const deleteBeneficiary = async (
   next: NextFunction,
 ) => {
   const { id } = req.body as IBeneficiary;
-  try {
-    const ben = await prismaClient.beneficiary.delete({ where: { id } });
-    res.json(ben);
-  } catch (error) {
-    console.log(error);
-  }
+
+  prismaOperation(
+    () =>
+      prismaClient.beneficiary.delete({
+        where: { id },
+        include: { Expense: true },
+      }),
+    res,
+  );
 };
 
 export {
