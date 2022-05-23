@@ -20,7 +20,6 @@ const postDonation = async (
     const don = await prismaClient.donation.create({
       data: { amount, category, donorId },
     });
-
     res.json(don);
   } catch (error) {
     res.json(error);

@@ -14,8 +14,9 @@ datasource db {
 }
 
 model Beneficiary {
-  id   Int    @id @default(autoincrement())
-  name String @unique
+  id      Int       @id @default(autoincrement())
+  name    String    @unique
+  Expense Expense[]
 }
 
 model Donor {
@@ -34,11 +35,27 @@ model Donation {
 }
 
 model User {
-  id       Int      @id @unique @default(autoincrement())
+  id       Int       @id @unique @default(autoincrement())
   name     String
   email    String?
   password String?
   role     UserRole
+  Expense  Expense[]
+}
+
+model Expense {
+  id            Int         @id @unique @default(autoincrement())
+  date          DateTime?
+  amount        Float
+  category      String
+  status        String?
+  paymentType   String?
+  comment       String?
+  project       String?
+  user          User        @relation(fields: [userId], references: [id])
+  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id])
+  userId        Int
+  beneficiaryId Int
 }
 
 enum UserRole {

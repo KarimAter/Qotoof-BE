@@ -1,3 +1,5 @@
+import { IDonor } from './donor';
+
 export interface IDonation {
   donationId: number;
   date: string;
@@ -6,7 +8,7 @@ export interface IDonation {
   status: string;
   payment: string;
   comment: string;
-  donor: string;
+  donor: IDonor;
 }
 
 export default IDonation;

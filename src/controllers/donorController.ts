@@ -7,6 +7,8 @@ const postDonor = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const donor = await prismaClient.donor.create({
       data: { name, referral: referral.name },
+      // const donors = await prismaClient.donor.findMany({
+      //   include: { Donation: true },
     });
     res.json(donor);
   } catch (error) {
