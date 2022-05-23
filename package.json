@@ -27,6 +27,7 @@
     "@prisma/client": "3.14.0",
     "body-parser": "^1.19.2",
     "express": "^4.17.3",
+    "express-validator": "^6.14.1",
     "mysql2": "^2.3.3"
   }
 }
