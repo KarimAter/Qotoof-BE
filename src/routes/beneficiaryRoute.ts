@@ -1,6 +1,5 @@
 import { Router } from 'express';
-import path from 'path';
-// import getBeneficiaries from '../controllers/beneficiaryController';
+import { ValidationChain, body } from 'express-validator';
 import {
   deleteBeneficiary,
   editBeneficiary,
@@ -16,10 +15,21 @@ const benRouter = Router();
 // const postFamily = require('../controllers/beneficiaryController');
 
 // creating a new beneficiary
+function beneficiaryValidation(): ValidationChain[] {
+  return [
+    body('beneficiaryName')
+      .exists()
+      .notEmpty()
+      .withMessage('Please enter a user name')
+      .isLength({ min: 3 })
+      .withMessage('short name'),
+  ];
+}
+
 benRouter
   .get('/:id', getBeneficiary)
   .get('/', getBeneficiaries)
-  .post('/', postBeneficiary)
+  .post('/', beneficiaryValidation(), postBeneficiary)
   .put('/', editBeneficiary)
   .delete('/', deleteBeneficiary);
 

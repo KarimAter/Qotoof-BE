@@ -11,7 +11,7 @@ const postUser = async (req: Request, res: Response, next: NextFunction) => {
     next(errors.array());
   } else {
     prismaOperation(
-      () => prismaClient.user.create({ data: { name, role } }),
+      () => prismaClient.user.create({ data: { name, role, password } }),
       res,
     );
   }

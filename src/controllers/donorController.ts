@@ -7,9 +7,16 @@ const postDonor = async (req: Request, res: Response, next: NextFunction) => {
   const { name, referral } = req.body as IDonor;
 
   prismaOperation(
-    () => prismaClient.donor.create({ data: { name, referral: referral.name } }),
+    () =>
+      prismaClient.donor.create({ data: { name, referral: referral.name } }),
     res,
   );
 };
 
-export default postDonor;
+const getDonors = async (req: Request, res: Response, next: NextFunction) => {
+  const { name, referral } = req.body as IDonor;
+
+  prismaOperation(() => prismaClient.donor.findMany(), res);
+};
+
+export { postDonor, getDonors };

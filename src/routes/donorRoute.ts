@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import postDonor from '../controllers/donorController';
+import { postDonor, getDonors } from '../controllers/donorController';
 
 const donorRouter = Router();
 
-donorRouter.post('/', postDonor);
+donorRouter.post('/', postDonor).get('/', getDonors);
 
 export default donorRouter;

@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { validationResult } from 'express-validator';
 import { IBeneficiary } from '../models/beneficiary';
 import prismaClient from '../utils/databaseConnector';
 import prismaOperation from '../utils/helperFunctions';
@@ -32,14 +33,20 @@ const postBeneficiary = async (
   res: Response,
   next: NextFunction,
 ) => {
+  const errors = validationResult(req);
   const { beneficiaryName } = req.body as IBeneficiary;
-  prismaOperation(
-    () =>
-      prismaClient.beneficiary.create({
-        data: { name: beneficiaryName },
-      }),
-    res,
-  );
+
+  if (!errors.isEmpty()) {
+    next(errors.array());
+  } else {
+    prismaOperation(
+      () =>
+        prismaClient.beneficiary.create({
+          data: { name: beneficiaryName },
+        }),
+      res,
+    );
+  }
 };
 
 const editBeneficiary = async (
