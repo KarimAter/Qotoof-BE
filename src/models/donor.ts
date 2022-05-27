@@ -1,7 +1,7 @@
 import { IUser } from './user';
 
 export interface IDonor {
-  donorId: number;
+  id: number;
   name: string;
   referral: IUser;
 }
