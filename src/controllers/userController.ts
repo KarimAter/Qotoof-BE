@@ -16,10 +16,14 @@ const postUser = async (req: Request, res: Response, next: NextFunction) => {
     );
   }
 };
+const getUsers = async (req: Request, res: Response, next: NextFunction) => {
+  // const errors = validationResult(req);
+  // const { name, email, password, role } = req.body as IUser;
+  // if (!errors.isEmpty()) {
+  //   next(errors.array());
+  // } else {
+  prismaOperation(() => prismaClient.user.findMany(), res);
+  // }
+};
 
-export default postUser;
-
-// const usrS = await prismaClient.user.findMany({
-//   include: { Expense: true },
-// });
-//
+export { postUser, getUsers };

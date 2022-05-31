@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import postExpense from '../controllers/expenseController';
+import { postExpense, getExpenses } from '../controllers/expenseController';
 
 const expenseRouter = Router();
 
-expenseRouter.post('/', postExpense);
+expenseRouter.post('/', postExpense).get('/', getExpenses);
 
 export default expenseRouter;

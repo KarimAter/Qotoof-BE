@@ -2,7 +2,7 @@ import { IBeneficiary } from './beneficiary';
 import { IUser } from './user';
 
 export interface IExpense {
-  expenseId: number;
+  id: number;
   date: string;
   amount: number;
   category: string;

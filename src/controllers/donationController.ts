@@ -36,5 +36,17 @@ const getDonations = async (
     res,
   );
 };
+const getDonation = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
 
-export { postDonation, getDonations };
+  prismaOperation(
+    () => prismaClient.donation.findMany({ where: { donorId: Number(id) } }),
+    res,
+  );
+
+  // prismaClient.donation.aggregate({
+  // _sum: { amount: true },
+  // where: { donorId: Number(id) },
+};
+
+export { postDonation, getDonations, getDonation };

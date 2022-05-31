@@ -1,6 +1,10 @@
 import { Router } from 'express';
 import { ValidationChain, body } from 'express-validator';
-import { postDonation, getDonations } from '../controllers/donationController';
+import {
+  postDonation,
+  getDonations,
+  getDonation,
+} from '../controllers/donationController';
 
 const donationRouter = Router();
 function donationValidation(): ValidationChain[] {
@@ -23,12 +27,12 @@ function donationValidation(): ValidationChain[] {
       .withMessage('Please enter a category')
       .isString()
       .withMessage('amount sent as string'),
-
   ];
 }
 
 donationRouter
   .post('/', donationValidation(), postDonation)
-  .get('/', getDonations);
+  .get('/', getDonations)
+  .get('/:id', getDonation);
 
 export default donationRouter;
