@@ -7,8 +7,7 @@ const postDonor = async (req: Request, res: Response, next: NextFunction) => {
   const { name, referral } = req.body as IDonor;
 
   prismaOperation(
-    () =>
-      prismaClient.donor.create({ data: { name, referral: referral.name } }),
+    () => prismaClient.donor.create({ data: { name, userId: referral.id } }),
     res,
   );
 };
@@ -16,7 +15,35 @@ const postDonor = async (req: Request, res: Response, next: NextFunction) => {
 const getDonors = async (req: Request, res: Response, next: NextFunction) => {
   const { name, referral } = req.body as IDonor;
 
-  prismaOperation(() => prismaClient.donor.findMany(), res);
+  prismaOperation(
+    () => prismaClient.donor.findMany({ include: { referral: true } }),
+    res,
+  );
 };
 
-export { postDonor, getDonors };
+const deleteDonor = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.body as IDonor;
+
+  prismaOperation(
+    () =>
+      prismaClient.donor.delete({
+        where: { id },
+      }),
+    res,
+  );
+};
+
+const editDonor = async (req: Request, res: Response, next: NextFunction) => {
+  const { id, name, referral } = req.body as IDonor;
+
+  prismaOperation(
+    () =>
+      prismaClient.donor.update({
+        where: { id },
+        data: { name, userId: referral.id },
+      }),
+    res,
+  );
+};
+
+export { postDonor, getDonors, deleteDonor, editDonor };

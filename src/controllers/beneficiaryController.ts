@@ -54,7 +54,7 @@ const editBeneficiary = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { id, beneficiaryName }: IBeneficiary = req.body;
+  const { id }: IBeneficiary = req.body;
   const { targetName } = req.body;
 
   prismaOperation(

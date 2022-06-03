@@ -5,7 +5,8 @@ export interface IUser {
   name: string;
   email?: string;
   password?: string;
-  role: 'ADMIN' | 'GUEST' | 'SUPER' | 'EDITOR';
+  role: 'SUPER' | 'ADMIN' | 'EDITOR' | 'GUEST';
+
 }
 
 export default IUser;

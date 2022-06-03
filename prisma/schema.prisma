@@ -22,16 +22,17 @@ model Beneficiary {
 model Donor {
   id       Int        @id @unique @default(autoincrement())
   name     String     @unique
-  referral String?
+  referral User       @relation(fields: [userId], references: [id])
   Donation Donation[]
+  userId   Int
 }
 
 model Donation {
-  id        Int     @id @unique @default(autoincrement())
-  amount    Float
-  category  String
-  donor     Donor   @relation(fields: [donorId], references: [id]) // fields the foregin key, reference the model key
-  donorId   Int     
+  id       Int    @id @unique @default(autoincrement())
+  amount   Float
+  category String
+  donor    Donor  @relation(fields: [donorId], references: [id]) // fields the foregin key, reference the model key
+  donorId  Int    @default(0)
 }
 
 model User {
@@ -41,6 +42,7 @@ model User {
   password String?
   role     UserRole
   Expense  Expense[]
+  Donor    Donor[]
 }
 
 model Expense {
@@ -53,7 +55,7 @@ model Expense {
   comment       String?
   project       String?
   user          User        @relation(fields: [userId], references: [id])
-  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId        Int
   beneficiaryId Int
 }
