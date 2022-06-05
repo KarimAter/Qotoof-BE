@@ -1,8 +1,6 @@
-import { Prisma } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { IDonation } from '../models/donation';
-import { IDonor } from '../models/donor';
 import prismaClient from '../utils/databaseConnector';
 import prismaOperation from '../utils/helperFunctions';
 
@@ -49,4 +47,53 @@ const getDonation = async (req: Request, res: Response, next: NextFunction) => {
   // where: { donorId: Number(id) },
 };
 
-export { postDonation, getDonations, getDonation };
+const editDonation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const {
+    id,
+    amount,
+    category,
+    comment,
+    date,
+    donor,
+    payment,
+    status,
+  }: IDonation = req.body;
+  const { targetName } = req.body;
+
+  prismaOperation(
+    () =>
+      prismaClient.donation.update({
+        where: { id: Number(id) },
+        data: { amount, category, donorId: donor.id },
+      }),
+    res,
+  );
+};
+
+const deleteDonation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { id } = req.body as IDonation;
+
+  prismaOperation(
+    () =>
+      prismaClient.donation.delete({
+        where: { id },
+      }),
+    res,
+  );
+};
+
+export {
+  postDonation,
+  getDonations,
+  getDonation,
+  editDonation,
+  deleteDonation,
+};

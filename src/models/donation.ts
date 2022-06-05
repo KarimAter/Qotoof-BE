@@ -1,7 +1,7 @@
 import { IDonor } from './donor';
 
 export interface IDonation {
-  donationId: number;
+  id: number;
   date: string;
   amount: number;
   category: string;

@@ -4,6 +4,8 @@ import {
   postDonation,
   getDonations,
   getDonation,
+  editDonation,
+  deleteDonation,
 } from '../controllers/donationController';
 
 const donationRouter = Router();
@@ -33,6 +35,8 @@ function donationValidation(): ValidationChain[] {
 donationRouter
   .post('/', donationValidation(), postDonation)
   .get('/', getDonations)
+  .put('/', editDonation)
+  .delete('/', deleteDonation)
   .get('/:id', getDonation);
 
 export default donationRouter;
