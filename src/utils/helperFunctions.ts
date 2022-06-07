@@ -22,6 +22,7 @@ export const errorHandler: ErrorRequestHandler = (
   next,
 ) => {
   const msg = errors instanceof Error ? errors.message : errors.map((err) => err.msg);
+  res.statusCode = 403;
   res.json({
     msg,
     // error: errors.message,

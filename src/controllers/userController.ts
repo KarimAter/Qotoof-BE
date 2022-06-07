@@ -70,7 +70,15 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
         { expiresIn: '1h' },
       );
 
-      res.json({ message: 'success', token, id: loadedUser?.id });
+      res.json({
+        message: 'success',
+        token,
+        user: {
+          id: loadedUser?.id,
+          name: loadedUser?.name,
+          role: loadedUser?.role,
+        },
+      });
     })
     .catch((error) => next(error));
   // }
