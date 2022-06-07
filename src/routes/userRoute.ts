@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body, ValidationChain } from 'express-validator';
-import { postUser, getUsers } from '../controllers/userController';
+import { postUser, getUsers, getUser } from '../controllers/userController';
 
 const userRouter = Router();
 
@@ -14,6 +14,9 @@ function userValidation(): ValidationChain[] {
     body('password').notEmpty(),
   ];
 }
-userRouter.post('/', userValidation(), postUser).get('/', getUsers);
+userRouter
+  .post('/login', getUser)
+  .post('/', userValidation(), postUser)
+  .get('/', getUsers);
 
 export default userRouter;

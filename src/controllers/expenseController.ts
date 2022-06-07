@@ -35,20 +35,60 @@ const getExpenses = async (req: Request, res: Response, next: NextFunction) => {
   prismaOperation(
     () =>
       prismaClient.expense.findMany({
-        select: {
-          id: true,
-          date: true,
-          amount: true,
-          category: true,
-          beneficiary: { select: { name: true } },
-          user: { select: { name: true } },
-          paymentType: true,
-          status: true,
-          project: true,
+        include: { user: true, beneficiary: true },
+      }),
+    res,
+  );
+};
+
+const editExpense = async (req: Request, res: Response, next: NextFunction) => {
+  const {
+    id,
+    amount,
+    category,
+    comment,
+    date,
+    beneficiary,
+    paymentType,
+    project,
+    user,
+    status,
+  }: IExpense = req.body;
+
+  prismaOperation(
+    () =>
+      prismaClient.expense.update({
+        where: { id: Number(id) },
+        data: {
+          amount,
+          beneficiaryId: beneficiary.id,
+          category,
+          comment,
+          date,
+          paymentType,
+          project,
+          status,
+          userId: user.id,
         },
       }),
     res,
   );
 };
 
-export { postExpense, getExpenses };
+const deleteExpense = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { ids } = req.body;
+
+  prismaOperation(
+    () =>
+      prismaClient.expense.deleteMany({
+        where: { id: { in: ids } },
+      }),
+    res,
+  );
+};
+
+export { postExpense, getExpenses, editExpense, deleteExpense };

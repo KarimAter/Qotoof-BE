@@ -1,6 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express';
-
-import { ValidationError } from 'express-validator';
+import express from 'express';
 import bodyParser from 'body-parser';
 import router from './routes/adminRoute';
 import { errorHandler } from './utils/helperFunctions';

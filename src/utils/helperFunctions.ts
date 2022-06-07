@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Prisma } from '@prisma/client';
-import { ErrorRequestHandler, NextFunction, Response } from 'express';
-import { Result, ValidationError } from 'express-validator';
+import { ErrorRequestHandler, Response } from 'express';
+import { ValidationError } from 'express-validator';
 
 async function prismaOperation(callback: () => Promise<any>, res: Response) {
   try {
@@ -16,13 +16,15 @@ async function prismaOperation(callback: () => Promise<any>, res: Response) {
 }
 
 export const errorHandler: ErrorRequestHandler = (
-  errors: ValidationError[],
+  errors: ValidationError[] | Error,
   req,
   res,
   next,
 ) => {
+  const msg = errors instanceof Error ? errors.message : errors.map((err) => err.msg);
   res.json({
-    errors,
+    msg,
+    // error: errors.message,
     // msg: `${errors[0].msg} ${errors[1].msg}`,
     // field: errors[0].param,
   });

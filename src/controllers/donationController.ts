@@ -79,12 +79,12 @@ const deleteDonation = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { id } = req.body as IDonation;
+  const { ids } = req.body;
 
   prismaOperation(
     () =>
-      prismaClient.donation.delete({
-        where: { id },
+      prismaClient.donation.deleteMany({
+        where: { id: { in: ids } },
       }),
     res,
   );
