@@ -30,7 +30,7 @@ export const errorHandler: ErrorRequestHandler = (
     // field: errors[0].param,
   });
 
-  console.log('App error', errors);
+  console.log('App error', msg);
 };
 
 export default prismaOperation;

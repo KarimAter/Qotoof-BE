@@ -36,7 +36,13 @@ const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   // if (!errors.isEmpty()) {
   //   next(errors.array());
   // } else {
-  prismaOperation(() => prismaClient.user.findMany(), res);
+  prismaOperation(
+    () =>
+      prismaClient.user.findMany({
+        select: { id: true, name: true, email: true, role: true },
+      }),
+    res,
+  );
   // }
 };
 const getUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -67,7 +73,7 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
       const token = sign(
         { email: loadedUser?.email, userId: loadedUser?.id },
         'secret',
-        { expiresIn: '1h' },
+        { expiresIn: '15m' },
       );
 
       res.json({
