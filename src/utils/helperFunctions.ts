@@ -2,6 +2,7 @@
 import { Prisma } from '@prisma/client';
 import { ErrorRequestHandler, Response } from 'express';
 import { ValidationError } from 'express-validator';
+import { JsonWebTokenError } from 'jsonwebtoken';
 
 async function prismaOperation(callback: () => Promise<any>, res: Response) {
   try {
@@ -16,20 +17,25 @@ async function prismaOperation(callback: () => Promise<any>, res: Response) {
 }
 
 export const errorHandler: ErrorRequestHandler = (
-  errors: ValidationError[] | Error,
+  errors: ValidationError[] | Error | JsonWebTokenError,
   req,
   res,
   next,
 ) => {
-  const msg = errors instanceof Error ? errors.message : errors.map((err) => err.msg);
-  res.statusCode = 403;
+  let msg;
+  if (errors instanceof JsonWebTokenError) {
+    res.statusCode = 401;
+    msg = errors.message;
+  } else if (errors instanceof Error) {
+    res.statusCode = 403;
+    msg = errors.message;
+  } else {
+    res.statusCode = 400;
+    msg = errors.map((err) => err.msg);
+  }
   res.json({
     msg,
-    // error: errors.message,
-    // msg: `${errors[0].msg} ${errors[1].msg}`,
-    // field: errors[0].param,
   });
-
   console.log('App error', msg);
 };
 

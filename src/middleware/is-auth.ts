@@ -4,7 +4,7 @@ import { verify } from 'jsonwebtoken';
 
 const isAuth = (req: Request, res: Response, next: NextFunction) => {
   const token = req.get('Authorization')?.split(' ')[1];
-  console.log(token);
+  // console.log(token);
   let decodedToken: any;
   try {
     if (token) {
