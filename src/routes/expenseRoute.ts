@@ -5,14 +5,15 @@ import {
   editExpense,
   deleteExpense,
 } from '../controllers/expenseController';
-import isAuth from '../middleware/is-auth';
+import isAuthenticated from '../middleware/is-authenticated';
+import { isAuthorized } from '../middleware/is-authorized';
 
 const expenseRouter = Router();
 
 expenseRouter
-  .post('/', isAuth, postExpense)
-  .get('/', isAuth, getExpenses)
-  .put('/', isAuth, editExpense)
-  .delete('/', isAuth, deleteExpense);
+  .post('/', isAuthenticated, postExpense)
+  .get('/', isAuthenticated, isAuthorized, getExpenses)
+  .put('/', isAuthenticated, editExpense)
+  .delete('/', isAuthenticated, deleteExpense);
 
 export default expenseRouter;

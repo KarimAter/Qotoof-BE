@@ -71,7 +71,11 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
         throw error;
       }
       const token = sign(
-        { email: loadedUser?.email, userId: loadedUser?.id },
+        {
+          email: loadedUser?.email,
+          userId: loadedUser?.id,
+          role: loadedUser?.role,
+        },
         'secret',
         { expiresIn: '15m' },
       );
