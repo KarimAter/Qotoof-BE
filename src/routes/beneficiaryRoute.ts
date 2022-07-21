@@ -7,6 +7,7 @@ import {
   getBeneficiary,
   postBeneficiary,
 } from '../controllers/beneficiaryController';
+import isAuthenticated from '../middleware/is-authenticated';
 
 const benRouter = Router();
 
@@ -27,11 +28,11 @@ function beneficiaryValidation(): ValidationChain[] {
 }
 
 benRouter
-  .get('/:id', getBeneficiary)
-  .get('/', getBeneficiaries)
-  .post('/', beneficiaryValidation(), postBeneficiary)
-  .put('/', editBeneficiary)
-  .delete('/', deleteBeneficiary);
+  .get('/:id', isAuthenticated, getBeneficiary)
+  .get('/', isAuthenticated, getBeneficiaries)
+  .post('/', isAuthenticated, beneficiaryValidation(), postBeneficiary)
+  .put('/', isAuthenticated, editBeneficiary)
+  .delete('/', isAuthenticated, deleteBeneficiary);
 
 // Editing an existing  beneficiary
 // benRouter.put('/:beneficiaryName', editBeneficiary);

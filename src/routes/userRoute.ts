@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { body, ValidationChain } from 'express-validator';
 import { postUser, getUsers, getUser } from '../controllers/userController';
 import UserRole from '../utils/Constants';
+import isAuthenticated from '../middleware/is-authenticated';
 
 const userRouter = Router();
 
@@ -27,6 +28,6 @@ function signUpValidation(): ValidationChain[] {
 userRouter
   .post('/login', getUser)
   .post('/', signUpValidation(), postUser)
-  .get('/', getUsers);
+  .get('/', isAuthenticated, getUsers);
 
 export default userRouter;

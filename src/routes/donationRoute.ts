@@ -7,6 +7,7 @@ import {
   editDonation,
   deleteDonation,
 } from '../controllers/donationController';
+import isAuthenticated from '../middleware/is-authenticated';
 
 const donationRouter = Router();
 function donationValidation(): ValidationChain[] {
@@ -33,10 +34,10 @@ function donationValidation(): ValidationChain[] {
 }
 
 donationRouter
-  .post('/', donationValidation(), postDonation)
-  .get('/', getDonations)
-  .put('/', editDonation)
-  .delete('/', deleteDonation)
-  .get('/:id', getDonation);
+  .post('/', isAuthenticated, donationValidation(), postDonation)
+  .get('/', isAuthenticated, getDonations)
+  .put('/', isAuthenticated, editDonation)
+  .delete('/', isAuthenticated, deleteDonation)
+  .get('/:id', isAuthenticated, getDonation);
 
 export default donationRouter;

@@ -1,8 +1,8 @@
 enum UserRole {
-  'ADMIN' = 0,
-  'GUEST' = 1,
-  'SUPER' = 2,
-  'EDITOR' = 3,
+  'GUEST' = 0,
+  'EDITOR' = 1,
+  'ADMIN' = 2,
+  'SUPER' = 3,
 }
 
 export default UserRole;
