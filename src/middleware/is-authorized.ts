@@ -26,4 +26,28 @@ export const isAuthorized = (
   }
 };
 
+export const isAuthorizedMethod = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+  authLevel: number,
+) => {
+  const role: string = req.body.userRole;
+  const userAuthLevel = Object.values(UserRole).indexOf(role);
+  try {
+    if (!role) {
+      const err = new Error('bad request');
+      throw err;
+    }
+    if (userAuthLevel < authLevel) {
+      const err = new Error('Not authorized');
+      throw err;
+    }
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default isAuthorized;
