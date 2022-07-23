@@ -77,7 +77,7 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
           role: loadedUser?.role,
         },
         'secret',
-        { expiresIn: '15m' },
+        { expiresIn: '1h' },
       );
 
       res.json({

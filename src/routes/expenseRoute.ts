@@ -12,7 +12,7 @@ const expenseRouter = Router();
 
 expenseRouter
   .post('/', isAuthenticated, postExpense)
-  .get('/', isAuthenticated)
+  .get('/', isAuthenticated, getExpenses)
   .put('/', isAuthenticated, editExpense)
   .delete('/', isAuthenticated, deleteExpense);
 

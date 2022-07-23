@@ -15,6 +15,18 @@ async function prismaOperation(callback: () => Promise<any>, res: Response) {
     return res.json(error);
   }
 }
+export async function prismaQuery(callback: () => Promise<any>) {
+  try {
+    const x = await callback();
+    return x;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      console.log(`${error.message}`);
+      return error.message;
+    }
+    return error;
+  }
+}
 
 export const errorHandler: ErrorRequestHandler = (
   errors: ValidationError[] | Error | JsonWebTokenError,
