@@ -12,12 +12,7 @@ const expenseRouter = Router();
 
 expenseRouter
   .post('/', isAuthenticated, postExpense)
-  .get(
-    '/',
-    isAuthenticated,
-    (req, res, next) => isAuthorizedMethod(req, res, next, 3),
-    getExpenses,
-  )
+  .get('/', isAuthenticated)
   .put('/', isAuthenticated, editExpense)
   .delete('/', isAuthenticated, deleteExpense);
 
