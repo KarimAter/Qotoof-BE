@@ -21,6 +21,7 @@ const postDonation = async (
           data: { amount, category, donorId: donor.id },
         }),
       res,
+      next,
     );
   }
 };
@@ -32,6 +33,7 @@ const getDonations = async (
   prismaOperation(
     () => prismaClient.donation.findMany({ include: { donor: true } }),
     res,
+    next,
   );
 };
 const getDonation = async (req: Request, res: Response, next: NextFunction) => {
@@ -40,6 +42,7 @@ const getDonation = async (req: Request, res: Response, next: NextFunction) => {
   prismaOperation(
     () => prismaClient.donation.findMany({ where: { donorId: Number(id) } }),
     res,
+    next,
   );
 
   // prismaClient.donation.aggregate({
@@ -71,6 +74,7 @@ const editDonation = async (
         data: { amount, category, donorId: donor.id },
       }),
     res,
+    next,
   );
 };
 
@@ -87,6 +91,7 @@ const deleteDonation = async (
         where: { id: { in: ids } },
       }),
     res,
+    next,
   );
 };
 

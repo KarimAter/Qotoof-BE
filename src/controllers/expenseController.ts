@@ -1,3 +1,4 @@
+import { error } from 'console';
 import { NextFunction, Request, Response } from 'express';
 import { IBeneficiary } from '../models/beneficiary';
 import { IExpense } from '../models/expense';
@@ -6,20 +7,26 @@ import prismaClient from '../utils/databaseConnector';
 import prismaOperation from '../utils/helperFunctions';
 
 const postExpense = async (req: Request, res: Response, next: NextFunction) => {
-  const { amount, category, user, beneficiary }: IExpense = req.body;
+  const { amount, incategory, outcategory, user, beneficiary }: IExpense = req.body;
 
-  prismaOperation(
-    () =>
-      prismaClient.expense.create({
-        data: {
-          amount,
-          category,
-          userId: user.id,
-          beneficiaryId: beneficiary.id,
-        },
-      }),
-    res,
-  );
+  try {
+    prismaOperation(
+      () =>
+        prismaClient.expense.create({
+          data: {
+            amount,
+            incategory,
+            outcategory,
+            userId: user.id,
+            beneficiaryId: beneficiary.id,
+          },
+        }),
+      res,
+      next,
+    );
+  } catch {
+    next(error);
+  }
 };
 const getExpenses = async (req: Request, res: Response, next: NextFunction) => {
   const {
@@ -38,6 +45,7 @@ const getExpenses = async (req: Request, res: Response, next: NextFunction) => {
         include: { user: true, beneficiary: true },
       }),
     res,
+    next,
   );
 };
 
@@ -45,7 +53,8 @@ const editExpense = async (req: Request, res: Response, next: NextFunction) => {
   const {
     id,
     amount,
-    category,
+    incategory,
+    outcategory,
     comment,
     date,
     beneficiary,
@@ -62,7 +71,8 @@ const editExpense = async (req: Request, res: Response, next: NextFunction) => {
         data: {
           amount,
           beneficiaryId: beneficiary.id,
-          category,
+          incategory,
+          outcategory,
           comment,
           date,
           paymentType,
@@ -72,6 +82,7 @@ const editExpense = async (req: Request, res: Response, next: NextFunction) => {
         },
       }),
     res,
+    next,
   );
 };
 
@@ -88,6 +99,7 @@ const deleteExpense = async (
         where: { id: { in: ids } },
       }),
     res,
+    next,
   );
 };
 

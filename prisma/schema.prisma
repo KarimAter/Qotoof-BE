@@ -28,11 +28,11 @@ model Donor {
 }
 
 model Donation {
-  id       Int    @id @unique @default(autoincrement())
+  id       Int              @id @unique @default(autoincrement())
   amount   Float
-  category String
-  donor    Donor  @relation(fields: [donorId], references: [id]) // fields the foregin key, reference the model key
-  donorId  Int    @default(0)
+  category DonationCategory
+  donor    Donor            @relation(fields: [donorId], references: [id]) // fields the foregin key, reference the model key
+  donorId  Int              @default(0)
 }
 
 model User {
@@ -46,16 +46,17 @@ model User {
 }
 
 model Expense {
-  id            Int         @id @unique @default(autoincrement())
+  id            Int              @id @unique @default(autoincrement())
   date          DateTime?
   amount        Float
-  category      String
+  incategory    DonationCategory
+  outcategory   ExpenseCategory
   status        String?
   paymentType   String?
   comment       String?
   project       String?
-  user          User        @relation(fields: [userId], references: [id])
-  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user          User             @relation(fields: [userId], references: [id])
+  beneficiary   Beneficiary      @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId        Int
   beneficiaryId Int
 }
@@ -65,4 +66,50 @@ enum UserRole {
   ADMIN
   EDITOR
   GUEST
+}
+
+enum ExpenseCategory {
+  Medication
+  Treatment
+  MedicalAid
+  Marriage
+  Projects
+  Meat
+  Adahy
+  Bags
+  Chicken
+  Transportation
+  HousingProject
+  LoansSettling
+  Meals
+  Mosque
+  WaterPipes
+  ZakatFitr
+}
+
+enum DonationCategory {
+  General
+  Zakat
+  Pharmacy
+  Meat
+  Chicken
+  Fruits
+  Bags
+  Meal
+  Food
+  Clothes
+  Hospital
+  Mosque
+  Logistics
+  Loans
+  Housing
+  WaterPipes
+  Marriage
+  ZakatFitr
+  TemporaryAid
+  MonthlyAid
+  Orphans
+  Treatment
+  Projects
+  Other
 }

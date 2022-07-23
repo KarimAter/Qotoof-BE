@@ -23,6 +23,7 @@ const postUser = async (req: Request, res: Response, next: NextFunction) => {
               data: { name, email, role, password: hashedPassword },
             }),
           res,
+          next,
         );
       } catch (error) {
         next(error);
@@ -42,6 +43,7 @@ const getUsers = async (req: Request, res: Response, next: NextFunction) => {
         select: { id: true, name: true, email: true, role: true },
       }),
     res,
+    next,
   );
   // }
 };

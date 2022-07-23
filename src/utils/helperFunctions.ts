@@ -1,18 +1,23 @@
+/* eslint-disable consistent-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Prisma } from '@prisma/client';
-import { ErrorRequestHandler, Response } from 'express';
+import {
+  PrismaClientInitializationError,
+  PrismaClientKnownRequestError,
+} from '@prisma/client/runtime';
+import { ErrorRequestHandler, NextFunction, Response } from 'express';
 import { ValidationError } from 'express-validator';
 import { JsonWebTokenError } from 'jsonwebtoken';
 
-async function prismaOperation(callback: () => Promise<any>, res: Response) {
+async function prismaOperation(
+  callback: () => Promise<any>,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     return res.json(await callback());
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      console.log(`${error.message}`);
-      return res.json(error.message);
-    }
-    return res.json(error);
+    if (next) next(error);
   }
 }
 export async function prismaQuery(callback: () => Promise<any>) {
@@ -28,6 +33,7 @@ export async function prismaQuery(callback: () => Promise<any>) {
   }
 }
 
+// Todo:update for Prisma errors
 export const errorHandler: ErrorRequestHandler = (
   errors: ValidationError[] | Error | JsonWebTokenError,
   req,

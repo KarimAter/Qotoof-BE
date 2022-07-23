@@ -9,6 +9,7 @@ const postDonor = async (req: Request, res: Response, next: NextFunction) => {
   prismaOperation(
     () => prismaClient.donor.create({ data: { name, userId: referral.id } }),
     res,
+    next,
   );
 };
 
@@ -18,6 +19,7 @@ const getDonors = async (req: Request, res: Response, next: NextFunction) => {
   prismaOperation(
     () => prismaClient.donor.findMany({ include: { referral: true } }),
     res,
+    next,
   );
 };
 
@@ -30,6 +32,7 @@ const deleteDonor = async (req: Request, res: Response, next: NextFunction) => {
         where: { id },
       }),
     res,
+    next,
   );
 };
 
@@ -43,6 +46,7 @@ const editDonor = async (req: Request, res: Response, next: NextFunction) => {
         data: { name, userId: referral.id },
       }),
     res,
+    next,
   );
 };
 

@@ -9,7 +9,7 @@ const getBeneficiaries = async (
   res: Response,
   next: NextFunction,
 ) => {
-  prismaOperation(() => prismaClient.beneficiary.findMany(), res);
+  prismaOperation(() => prismaClient.beneficiary.findMany(), res, next);
 };
 
 const getBeneficiary = async (
@@ -25,6 +25,7 @@ const getBeneficiary = async (
         where: { id: Number(id) },
       }),
     res,
+    next,
   );
 };
 
@@ -45,6 +46,7 @@ const postBeneficiary = async (
           data: { name: beneficiaryName },
         }),
       res,
+      next,
     );
   }
 };
@@ -64,6 +66,7 @@ const editBeneficiary = async (
         data: { name: targetName },
       }),
     res,
+    next,
   );
 };
 
@@ -81,6 +84,7 @@ const deleteBeneficiary = async (
         include: { Expense: true },
       }),
     res,
+    next,
   );
 };
 
