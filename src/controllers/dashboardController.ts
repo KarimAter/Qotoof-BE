@@ -1,33 +1,47 @@
+/* eslint-disable consistent-return */
+/* eslint-disable no-underscore-dangle */
 import { NextFunction, Request, Response } from 'express';
-import { get } from 'https';
-import { IBeneficiary } from '../models/beneficiary';
-import { IExpense } from '../models/expense';
-import { IUser } from '../models/user';
+import { CashInType, CashOutType, CategoryBalance } from '../utils/Constants';
 import prismaClient from '../utils/databaseConnector';
 import prismaOperation, { prismaQuery } from '../utils/helperFunctions';
 
 const getCashIn = async (req: Request, res: Response, next: NextFunction) => {
-  const {
-    user,
-    beneficiary,
-    expense,
-  }: {
-    user: IUser;
-    beneficiary: IBeneficiary;
-    expense: IExpense;
-  } = req.body;
-
-  const cashIn = await prismaQuery(() =>
+  const cashIn: CashInType[] = await prismaQuery(() =>
     prismaClient.donation.groupBy({
       by: ['category'],
       _sum: { amount: true },
     }));
-  const cashOut = await prismaQuery(() =>
+  const cashOut: CashOutType[] = await prismaQuery(() =>
     prismaClient.expense.groupBy({
-      by: ['category'],
+      by: ['incategory'],
       _sum: { amount: true },
     }));
+
   console.log(cashIn, cashOut);
+
+  const inCategories = cashIn.map((i) => i.category);
+  const presentCategories = inCategories.concat(
+    cashOut.map((o) => o.incategory).filter((x) => !inCategories.includes(x)),
+  );
+
+  const result = presentCategories.map((category) => {
+    const categoryIncomeBalance = cashIn
+      ?.filter((cat) => cat.category === category)
+      .map((cat) => cat._sum.amount);
+    const categoryExpenseBalance = cashOut
+      ?.filter((cat) => cat.incategory === category)
+      .map((cat) => cat._sum.amount);
+
+    const inBalance = categoryIncomeBalance.length > 0 ? categoryIncomeBalance[0] : 0;
+    const outBalance = categoryExpenseBalance.length > 0 ? categoryExpenseBalance[0] : 0;
+    return { category, balance: inBalance - outBalance };
+  });
+  console.log(result);
+  try {
+    return res.json(result);
+  } catch (error) {
+    if (next) next(error);
+  }
 };
 
 export default getCashIn;

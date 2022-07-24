@@ -6,3 +6,10 @@ enum UserRole {
 }
 
 export default UserRole;
+
+export type CashInType = { _sum: { amount: number }; category: string };
+export type CashOutType = { _sum: { amount: number }; incategory: string };
+export type CategoryBalance = {
+  category: string;
+  balance: number;
+};

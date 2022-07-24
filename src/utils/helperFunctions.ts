@@ -1,10 +1,6 @@
 /* eslint-disable consistent-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Prisma } from '@prisma/client';
-import {
-  PrismaClientInitializationError,
-  PrismaClientKnownRequestError,
-} from '@prisma/client/runtime';
 import { ErrorRequestHandler, NextFunction, Response } from 'express';
 import { ValidationError } from 'express-validator';
 import { JsonWebTokenError } from 'jsonwebtoken';
@@ -22,8 +18,8 @@ async function prismaOperation(
 }
 export async function prismaQuery(callback: () => Promise<any>) {
   try {
-    const x = await callback();
-    return x;
+    const result = await callback();
+    return result;
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       console.log(`${error.message}`);
