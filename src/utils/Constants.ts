@@ -13,3 +13,30 @@ export type CategoryBalance = {
   category: string;
   balance: number;
 };
+
+export const categoryCarryover = [
+  { category: 'General', balance: 10000 },
+  { category: 'Zakat', balance: 0 },
+  { category: 'Pharmacy', balance: 0 },
+  { category: 'Meat', balance: 0 },
+  { category: 'Chicken', balance: 0 },
+  { category: 'Fruits', balance: 0 },
+  { category: 'Bags', balance: 0 },
+  { category: 'Meal', balance: 0 },
+  { category: 'Food', balance: 0 },
+  { category: 'Clothes', balance: 0 },
+  { category: 'Hospital', balance: 0 },
+  { category: 'Mosque', balance: 0 },
+  { category: 'Logistics', balance: 0 },
+  { category: 'Loans', balance: 0 },
+  { category: 'Housing', balance: 0 },
+  { category: 'WaterPipes', balance: 0 },
+  { category: 'Marriage', balance: 0 },
+  { category: 'ZakatFitr', balance: 0 },
+  { category: 'TemporaryAid', balance: 0 },
+  { category: 'MonthlyAid', balance: 0 },
+  { category: 'Orphans', balance: 0 },
+  { category: 'Treatment', balance: 0 },
+  { category: 'Projects', balance: 0 },
+  { category: 'Other', balance: 0 },
+];

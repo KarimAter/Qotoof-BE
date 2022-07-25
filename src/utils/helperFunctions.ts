@@ -42,7 +42,9 @@ export const errorHandler: ErrorRequestHandler = (
     msg = errors.message;
   } else if (errors instanceof Error) {
     msg = errors.message;
-    res.statusCode = msg === 'Not authenticated' ? 401 : 403;
+    if (msg?.includes('database')) res.statusCode = 500;
+    else if (msg === 'Not authenticated') res.statusCode = 401;
+    else res.statusCode = 403;
   } else {
     res.statusCode = 400;
     msg = errors.map((err) => err.msg);

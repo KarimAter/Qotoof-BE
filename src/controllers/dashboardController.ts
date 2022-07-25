@@ -1,9 +1,14 @@
+/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
 import { NextFunction, Request, Response } from 'express';
-import { CashInType, CashOutType, CategoryBalance } from '../utils/Constants';
+import {
+  CashInType,
+  CashOutType,
+  categoryCarryover,
+} from '../utils/Constants';
 import prismaClient from '../utils/databaseConnector';
-import prismaOperation, { prismaQuery } from '../utils/helperFunctions';
+import { prismaQuery } from '../utils/helperFunctions';
 
 const getCashIn = async (req: Request, res: Response, next: NextFunction) => {
   const cashIn: CashInType[] = await prismaQuery(() =>
@@ -25,6 +30,7 @@ const getCashIn = async (req: Request, res: Response, next: NextFunction) => {
   );
 
   const result = presentCategories.map((category) => {
+    const carryover = categoryCarryover.filter((x) => x.category === category);
     const categoryIncomeBalance = cashIn
       ?.filter((cat) => cat.category === category)
       .map((cat) => cat._sum.amount);
@@ -34,7 +40,10 @@ const getCashIn = async (req: Request, res: Response, next: NextFunction) => {
 
     const inBalance = categoryIncomeBalance.length > 0 ? categoryIncomeBalance[0] : 0;
     const outBalance = categoryExpenseBalance.length > 0 ? categoryExpenseBalance[0] : 0;
-    return { category, balance: inBalance - outBalance };
+    return {
+      category,
+      balance: inBalance - outBalance + carryover[0].balance,
+    };
   });
   console.log(result);
   try {
