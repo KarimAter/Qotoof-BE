@@ -12,3 +12,8 @@ mysql --version
 sudo /etc/init.d/mysql start
 sudo mysql_secure_installation
 npx prisma migrate dev --name init
+
+# For Docker
+
+npx prisma generate
+npx prisma db push
