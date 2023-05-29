@@ -1,21 +1,37 @@
-version: "3.9"
+version: '3.9'
 services:
-    qotoof:
-        build:
-            context: .
-            dockerfile: Dockerfile
-        container_name: qotoofbe
-        depends_on:
-            - database
-        ports:
-            - 8000:8000
-        # command: npx prisma db push
-    database:
-        image: mysql:latest
-        container_name: dockersqlcompose
-        hostname: localhost
-        environment:
-            - MYSQL_ROOT_PASSWORD=admin
-            - MYSQL_TCP_PORT=4000
-        ports:
-            - 4000:4000
+  database:
+    image: mysql:latest
+    container_name: dockersqlcompose
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+    ports:
+      - 4000:3306
+    volumes:
+      - ./db_data:/var/lib/mysql
+    user: 'mysql:mysql'
+  qotoof:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: qotoofbe
+    depends_on:
+      - database
+    ports:
+      - 8000:8000
+    environment:
+      - DATABASE_URL=${CONTAINER_DB_URL}
+  spring-qutoof:
+    build:
+      context: ../Qutoof-Spring-BE/Qutoof
+      dockerfile: Dockerfile
+    container_name: spring-qutoof
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/PrismaDB?useSSL=false
+    depends_on:
+      - database
+    restart: always
+    volumes:
+      - ./uploads:/Qutoof/src/main/java/com/ater/qutoof/uploads
+    ports:
+      - 8888:8888
