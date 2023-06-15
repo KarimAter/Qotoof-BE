@@ -23,7 +23,7 @@ services:
       - DATABASE_URL=${CONTAINER_DB_URL}
   spring-qutoof:
     build:
-      context: ../Qutoof-Spring-BE/Qutoof
+      context: ./SpringBE
       dockerfile: Dockerfile
     container_name: spring-qutoof
     environment:

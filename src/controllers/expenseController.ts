@@ -8,6 +8,7 @@ import prismaOperation from '../utils/helperFunctions';
 
 const postExpense = async (req: Request, res: Response, next: NextFunction) => {
   const { amount, incategory, outcategory, user, beneficiary }: IExpense = req.body;
+  console.log(beneficiary);
 
   try {
     prismaOperation(
@@ -19,6 +20,7 @@ const postExpense = async (req: Request, res: Response, next: NextFunction) => {
             outcategory,
             userId: user.id,
             beneficiaryId: beneficiary.id,
+            beneficiaryName: beneficiary.name,
           },
         }),
       res,
@@ -67,7 +69,7 @@ const editExpense = async (req: Request, res: Response, next: NextFunction) => {
   prismaOperation(
     () =>
       prismaClient.expense.update({
-        where: { id: Number(id) },
+        where: { id: String(id) },
         data: {
           amount,
           beneficiaryId: beneficiary.id,

@@ -15,8 +15,8 @@ export type CategoryBalance = {
 };
 
 export const categoryCarryover = [
-  { category: 'General', balance: 10000 },
-  { category: 'Zakat', balance: 0 },
+  { category: 'General', balance: -1815 },
+  { category: 'Zakat', balance: 13525 },
   { category: 'Pharmacy', balance: 0 },
   { category: 'Meat', balance: 0 },
   { category: 'Chicken', balance: 0 },
@@ -30,7 +30,7 @@ export const categoryCarryover = [
   { category: 'Logistics', balance: 0 },
   { category: 'Loans', balance: 0 },
   { category: 'Housing', balance: 0 },
-  { category: 'WaterPipes', balance: 0 },
+  { category: 'WaterPipes', balance: 600 },
   { category: 'Marriage', balance: 0 },
   { category: 'ZakatFitr', balance: 0 },
   { category: 'TemporaryAid', balance: 0 },
@@ -38,5 +38,5 @@ export const categoryCarryover = [
   { category: 'Orphans', balance: 0 },
   { category: 'Treatment', balance: 0 },
   { category: 'Projects', balance: 0 },
-  { category: 'Other', balance: 0 },
+  { category: 'Other', balance: 1300 },
 ];

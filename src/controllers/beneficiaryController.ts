@@ -9,7 +9,16 @@ const getBeneficiaries = async (
   res: Response,
   next: NextFunction,
 ) => {
-  prismaOperation(() => prismaClient.beneficiary.findMany(), res, next);
+  prismaOperation(
+    () =>
+      prismaClient.beneficiary.findMany({
+        include: {
+          Expense: true,
+        },
+      }),
+    res,
+    next,
+  );
 };
 
 const getBeneficiary = async (
@@ -17,7 +26,7 @@ const getBeneficiary = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { id, beneficiaryName } = req.params;
+  const { id, name } = req.params;
 
   prismaOperation(
     () =>
@@ -35,7 +44,7 @@ const postBeneficiary = async (
   next: NextFunction,
 ) => {
   const errors = validationResult(req);
-  const { beneficiaryName } = req.body as IBeneficiary;
+  const { name } = req.body as IBeneficiary;
 
   if (!errors.isEmpty()) {
     next(errors.array());
@@ -43,7 +52,7 @@ const postBeneficiary = async (
     prismaOperation(
       () =>
         prismaClient.beneficiary.create({
-          data: { name: beneficiaryName },
+          data: { name },
         }),
       res,
       next,

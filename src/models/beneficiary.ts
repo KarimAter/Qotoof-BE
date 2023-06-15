@@ -2,7 +2,7 @@ import sequelize from '../utils/databaseConnector';
 
 export interface IBeneficiary {
   id: number;
-  beneficiaryName: string;
+  name: string;
 }
 
 export default IBeneficiary;
