@@ -1,31 +1,27 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import { Beneficiary } from '../models/beneficiary';
+import { NextFunction, Request, Response } from 'express';
+import { ICategory } from '../models/Category';
 import prismaClient from '../utils/databaseConnector';
 import prismaOperation from '../utils/helperFunctions';
 import ValidationError from '../middleware/Errors/InvalidRequestError';
+import { ExpenseCategory } from '../models/expenseCategory';
 
-const getBeneficiaries = async (
+const getExpenseCategories = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const result = await prismaOperation(
-    () =>
-      prismaClient.beneficiary.findMany({
-        include: {
-          Expense: true,
-        },
-      }),
+    () => prismaClient.expenseCategory.findMany(),
     res,
     next,
   );
+
   req.body = result;
   next();
 };
 
-const getBeneficiary = async (
+const getExpenseCategory = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -39,7 +35,7 @@ const getBeneficiary = async (
 
     const result = await prismaOperation(
       () =>
-        prismaClient.beneficiary.findUnique({
+        prismaClient.expenseCategory.findUnique({
           where: { id: Number(id) },
         }),
       res,
@@ -51,38 +47,22 @@ const getBeneficiary = async (
     next(error);
   }
 };
-const postBeneficiary = async (
+
+const postExpenseCategory = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const errors = validationResult(req);
-  const {
-    shortName,
-    firstName,
-    lastName,
-    fullName,
-    age,
-    maritalStatus,
-    address,
-  } = req.body as Beneficiary;
+  const { name, carryover } = req.body as ExpenseCategory;
   try {
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);
     }
-
     const result = await prismaOperation(
       () =>
-        prismaClient.beneficiary.create({
-          data: {
-            short_name: shortName,
-            first_name: firstName,
-            last_name: lastName,
-            full_name: fullName,
-            age,
-            marital_status: maritalStatus,
-            address,
-          },
+        prismaClient.expenseCategory.create({
+          data: { name, carryover },
         }),
       res,
       next,
@@ -94,22 +74,14 @@ const postBeneficiary = async (
   }
 };
 
-const editBeneficiary = async (
+const editExpenseCategory = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const errors = validationResult(req);
-  const {
-    id,
-    shortName,
-    firstName,
-    lastName,
-    fullName,
-    age,
-    maritalStatus,
-    address,
-  }: Beneficiary = req.body;
+
+  const { id, name, carryover } = req.body as ExpenseCategory;
   try {
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);
@@ -117,17 +89,9 @@ const editBeneficiary = async (
 
     const result = await prismaOperation(
       () =>
-        prismaClient.beneficiary.update({
+        prismaClient.expenseCategory.update({
           where: { id: Number(id) },
-          data: {
-            short_name: shortName,
-            first_name: firstName,
-            last_name: lastName,
-            full_name: fullName,
-            age,
-            marital_status: maritalStatus,
-            address,
-          },
+          data: { name, carryover },
         }),
       res,
       next,
@@ -139,7 +103,7 @@ const editBeneficiary = async (
   }
 };
 
-const deleteBeneficiary = async (
+const deleteExpenseCategory = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -153,9 +117,8 @@ const deleteBeneficiary = async (
 
     const result = await prismaOperation(
       () =>
-        prismaClient.beneficiary.delete({
+        prismaClient.expenseCategory.delete({
           where: { id: Number(id) },
-          include: { Expense: true },
         }),
       res,
       next,
@@ -168,9 +131,9 @@ const deleteBeneficiary = async (
 };
 
 export {
-  getBeneficiaries,
-  getBeneficiary,
-  postBeneficiary,
-  editBeneficiary,
-  deleteBeneficiary,
+  getExpenseCategories,
+  getExpenseCategory,
+  postExpenseCategory,
+  editExpenseCategory,
+  deleteExpenseCategory,
 };

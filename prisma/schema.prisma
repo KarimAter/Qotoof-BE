@@ -14,61 +14,99 @@ datasource db {
 }
 
 model Beneficiary {
-  id            Int       @id @unique @default(autoincrement())
-  name          String    @unique
-  firstName     String?
-  lastName      String?
-  fullName      String?
-  age           Int?
-  maritalStatus String?
-  address       String?
-  Expense       Expense[]
-
-  @@unique([id, name])
+  id             Int       @id @unique @default(autoincrement())
+  short_name     String    @unique
+  first_name     String?
+  last_name      String?
+  full_name      String?
+  age            Int?
+  marital_status String?
+  address        String?
+  Expense        Expense[]
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
 }
 
 model Donor {
-  id       Int        @id @unique @default(autoincrement())
-  name     String     @unique
-  referral User       @relation(fields: [userId], references: [id])
-  Donation Donation[]
-  userId   Int
+  id          Int        @id @unique @default(autoincrement())
+  short_name  String     @unique
+  referral    Referral   @relation(fields: [referral_id], references: [id])
+  donations   Donation[]
+  referral_id Int
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+}
+
+model DonationCategory {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  carryover  Float
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  donations  Donation[]
+  Expense    Expense[]
+}
+
+model ExpenseCategory {
+  id         Int       @id @default(autoincrement())
+  name       String    @unique
+  carryover  Float
+  expenses   Expense[]
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
 }
 
 model Donation {
-  id       Int              @id @unique @default(autoincrement())
-  date     DateTime?
-  amount   Float
-  category DonationCategory
-  donor    Donor            @relation(fields: [donorId], references: [id]) // fields the foregin key, reference the model key
-  donorId  Int              @default(0)
-}
-
-model User {
-  id       Int       @id @unique @default(autoincrement())
-  name     String
-  email    String?
-  password String?
-  role     UserRole
-  Expense  Expense[]
-  Donor    Donor[]
+  id                   String           @id @default(uuid())
+  date                 DateTime?
+  amount               Float
+  donation_category    DonationCategory @relation(fields: [donation_category_id], references: [id])
+  donor                Donor            @relation(fields: [donor_id], references: [id])
+  donation_category_id Int
+  donor_id             Int
+  created_at           DateTime         @default(now())
+  updated_at           DateTime         @updatedAt
 }
 
 model Expense {
-  id              String           @id @default(uuid())
-  date            DateTime?
-  amount          Float
-  incategory      DonationCategory
-  outcategory     ExpenseCategory
-  status          String?
-  paymentType     String?
-  comment         String?
-  project         String?
-  user            User             @relation(fields: [userId], references: [id])
-  beneficiary     Beneficiary?     @relation(fields: [beneficiaryId, beneficiaryName], references: [id, name], onDelete: Cascade, onUpdate: Cascade)
-  userId          Int
-  beneficiaryId   Int
-  beneficiaryName String
+  id                   String           @id @default(uuid())
+  date                 DateTime?
+  amount               Float
+  donation_category    DonationCategory @relation(fields: [donation_category_id], references: [id])
+  expense_category     ExpenseCategory  @relation(fields: [expense_category_id], references: [id])
+  beneficiary          Beneficiary      @relation(fields: beneficiary_id, references: id, onDelete: Cascade, onUpdate: Cascade)
+  user                 User             @relation(fields: [user_id], references: [id])
+  status               String?
+  payment_type         String?
+  comment              String?
+  project              String?
+  user_id              Int
+  beneficiary_id       Int
+  donation_category_id Int
+  expense_category_id  Int
+  created_at           DateTime         @default(now())
+  updated_at           DateTime         @updatedAt
+}
+
+model User {
+  id                Int       @id @unique @default(autoincrement())
+  short_name        String    @unique
+  email             String?
+  password          String?
+  role              UserRole
+  recieved_expenses Expense[]
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+}
+
+model Referral {
+  id              Int      @id @unique @default(autoincrement())
+  short_name      String   @unique
+  first_name      String?
+  last_name       String?
+  referred_donors Donor[]
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 }
 
 enum UserRole {
@@ -76,53 +114,4 @@ enum UserRole {
   ADMIN
   EDITOR
   GUEST
-}
-
-enum ExpenseCategory {
-  Medication
-  Treatment
-  MedicalAid
-  Marriage
-  Projects
-  Meat
-  Adahy
-  Bags
-  Chicken
-  Transportation
-  HousingProject
-  LoansSettling
-  Meals
-  Mosque
-  WaterPipes
-  ZakatFitr
-  MonthlyAid
-  Other
-  Loans
-}
-
-enum DonationCategory {
-  General
-  Zakat
-  Pharmacy
-  Meat
-  Chicken
-  Fruits
-  Bags
-  Meal
-  Food
-  Clothes
-  Hospital
-  Mosque
-  Logistics
-  Loans
-  Housing
-  WaterPipes
-  Marriage
-  ZakatFitr
-  TemporaryAid
-  MonthlyAid
-  Orphans
-  Treatment
-  Projects
-  Other
 }

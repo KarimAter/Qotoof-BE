@@ -1,28 +1,42 @@
 import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import { IDonation } from '../models/donation';
+// eslint-disable-next-line import/no-named-as-default
+import Donation from '../models/donation';
 import prismaClient from '../utils/databaseConnector';
 import prismaOperation from '../utils/helperFunctions';
+import ValidationError from '../middleware/Errors/InvalidRequestError';
 
 const postDonation = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const { amount, category, comment, date, payment, status, donor }: IDonation = req.body;
-  const errors = validationResult(req);
+  const { date, amount, donationCategory, donor }: Donation = req.body;
 
-  if (!errors.isEmpty()) {
-    next(errors.array());
-  } else {
-    prismaOperation(
+  const errors = validationResult(req);
+  try {
+    if (!errors.isEmpty()) {
+      throw new ValidationError('Invalid input', errors);
+    }
+
+    const result = await prismaOperation(
       () =>
         prismaClient.donation.create({
-          data: { amount, category, donorId: donor.id },
+          data: {
+            date: new Date(date),
+            amount,
+            donation_category_id: donationCategory.id,
+            donor_id: donor.id,
+          },
+          include: { donation_category: true, donor: true },
         }),
       res,
       next,
     );
+    req.body = result;
+    next();
+  } catch (error) {
+    next(error);
   }
 };
 const getDonations = async (
@@ -30,20 +44,41 @@ const getDonations = async (
   res: Response,
   next: NextFunction,
 ) => {
-  prismaOperation(
-    () => prismaClient.donation.findMany({ include: { donor: true } }),
+  const result = await prismaOperation(
+    () =>
+      prismaClient.donation.findMany({
+        // include: { referral: { select: { short_name: true } } },
+        include: {
+          // donation_category: { select: { id: true, name: true } },
+          // donor: { select: { id: true, short_name: true } },
+          donation_category: true,
+          donor: true,
+        },
+      }),
     res,
     next,
   );
+  req.body = result;
+  next();
 };
 const getDonation = async (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req);
   const { id } = req.params;
+  try {
+    if (!errors.isEmpty()) {
+      throw new ValidationError('Invalid input', errors);
+    }
 
-  prismaOperation(
-    () => prismaClient.donation.findMany({ where: { donorId: Number(id) } }),
-    res,
-    next,
-  );
+    const result = await prismaOperation(
+      () => prismaClient.donation.findUnique({ where: { id } }),
+      res,
+      next,
+    );
+    req.body = result === null ? [] : result;
+    next();
+  } catch (error) {
+    next(error);
+  }
 
   // prismaClient.donation.aggregate({
   // _sum: { amount: true },
@@ -55,27 +90,34 @@ const editDonation = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const {
-    id,
-    amount,
-    category,
-    comment,
-    date,
-    donor,
-    payment,
-    status,
-  }: IDonation = req.body;
-  const { targetName } = req.body;
+  const errors = validationResult(req);
 
-  prismaOperation(
-    () =>
-      prismaClient.donation.update({
-        where: { id: Number(id) },
-        data: { amount, category, donorId: donor.id },
-      }),
-    res,
-    next,
-  );
+  const { id, date, amount, donationCategory, donor }: Donation = req.body;
+
+  try {
+    if (!errors.isEmpty()) {
+      throw new ValidationError('Invalid input', errors);
+    }
+
+    const result = await prismaOperation(
+      () =>
+        prismaClient.donation.update({
+          where: { id },
+          data: {
+            date,
+            amount,
+            donation_category_id: donationCategory.id,
+            donor_id: donor.id,
+          },
+        }),
+      res,
+      next,
+    );
+    req.body = result;
+    next();
+  } catch (error) {
+    next(error);
+  }
 };
 
 const deleteDonation = async (
@@ -83,16 +125,35 @@ const deleteDonation = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { ids } = req.body;
+  const { id } = req.params;
+  const errors = validationResult(req);
+  try {
+    if (!errors.isEmpty()) {
+      throw new ValidationError('Invalid input', errors);
+    }
 
-  prismaOperation(
-    () =>
-      prismaClient.donation.deleteMany({
-        where: { id: { in: ids } },
-      }),
-    res,
-    next,
-  );
+    const result = await prismaOperation(
+      () =>
+        prismaClient.donation.delete({
+          where: { id },
+        }),
+      res,
+      next,
+    );
+    req.body = result;
+    next();
+  } catch (error) {
+    next(error);
+  }
+
+  // prismaOperation(
+  //   () =>
+  //     prismaClient.donation.deleteMany({
+  //       where: { id: { in: ids } },
+  //     }),
+  //   res,
+  //   next,
+  // );
 };
 
 export {

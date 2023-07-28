@@ -1,58 +1,57 @@
-import { IBeneficiary } from './beneficiary';
-import { IUser } from './user';
+import { BasicModel, IExpense } from './interfaces';
+import { donationCategoryMapper } from './donationCategory';
+import { expenseCategoryMapper } from './expenseCategory';
+import { userMapper } from './user';
+import { Beneficiary, beneficiaryMapper } from './beneficiary';
 
-export interface IExpense {
-  id: number;
+export interface Expense {
+  id: string;
   date: string;
   amount: number;
-  incategory:
-    | 'General'
-    | 'Zakat'
-    | 'Pharmacy'
-    | 'Meat'
-    | 'Chicken'
-    | 'Fruits'
-    | 'Bags'
-    | 'Meal'
-    | 'Food'
-    | 'Clothes'
-    | 'Hospital'
-    | 'Mosque'
-    | 'Logistics'
-    | 'Loans'
-    | 'Housing'
-    | 'WaterPipes'
-    | 'Marriage'
-    | 'ZakatFitr'
-    | 'TemporaryAid'
-    | 'MonthlyAid'
-    | 'Orphans'
-    | 'Treatment'
-    | 'Projects'
-    | 'Other';
-  outcategory:
-      'Medication'
-    | 'Treatment'
-    | 'MedicalAid'
-    | 'Marriage'
-    | 'Projects'
-    | 'Meat'
-    | 'Adahy'
-    | 'Bags'
-    | 'Chicken'
-    | 'Transportation'
-    | 'HousingProject'
-    | 'LoansSettling'
-    | 'Meals'
-    | 'Mosque'
-    | 'WaterPipes'
-    | 'ZakatFitr';
-  status: string;
-  paymentType: string;
-  comment: string;
-  project: string;
-  user: IUser;
-  beneficiary: IBeneficiary;
+  donationCategory: BasicModel;
+  expenseCategory: BasicModel;
+  status?: string;
+  paymentType?: string;
+  comment?: string;
+  project?: string;
+  user: BasicModel;
+  beneficiary: Beneficiary;
 }
+export const expenseMapper = (expenses: IExpense[]): Expense[] => {
+  const expenseDTOs = expenses.map((expense) => {
+    const {
+      id,
+      date,
+      amount,
 
-export default IExpense;
+      status,
+      paymentType,
+      comment,
+      project,
+      user,
+      beneficiary,
+    } = expense;
+    console.log('Expense Mapper:::', expense);
+    console.log(
+      'expenseCategoryMapper:::',
+      expenseCategoryMapper([expense.expense_category], true),
+    );
+    const expenseDTO: Expense = {
+      id,
+      date,
+      amount,
+      donationCategory: donationCategoryMapper([expense.donation_category], true)[0],
+      expenseCategory: expenseCategoryMapper([expense.expense_category], true)[0],
+      status,
+      paymentType,
+      comment,
+      project,
+      user: userMapper([user], true)[0],
+      beneficiary: beneficiaryMapper([beneficiary], true)[0],
+    };
+    return expenseDTO;
+  });
+  return expenseDTOs;
+};
+
+export default Expense;

@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import router from './routes/adminRoute';
-import { errorHandler } from './utils/helperFunctions';
+import errorHandler from './middleware/error-handler';
 
 const app = express();
 
@@ -18,7 +18,6 @@ app.use((req, res, next) => {
   next();
 });
 app.use(router);
-
 app.use(errorHandler);
 
 app.listen(8000);

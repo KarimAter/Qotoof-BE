@@ -1,23 +1,17 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import { Beneficiary } from '../models/beneficiary';
 import prismaClient from '../utils/databaseConnector';
 import prismaOperation from '../utils/helperFunctions';
 import ValidationError from '../middleware/Errors/InvalidRequestError';
+import { DonationCategory } from '../models/donationCategory';
 
-const getBeneficiaries = async (
+const getDonationCategories = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const result = await prismaOperation(
-    () =>
-      prismaClient.beneficiary.findMany({
-        include: {
-          Expense: true,
-        },
-      }),
+    () => prismaClient.donationCategory.findMany(),
     res,
     next,
   );
@@ -25,7 +19,7 @@ const getBeneficiaries = async (
   next();
 };
 
-const getBeneficiary = async (
+const getDonationCategory = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -39,7 +33,7 @@ const getBeneficiary = async (
 
     const result = await prismaOperation(
       () =>
-        prismaClient.beneficiary.findUnique({
+        prismaClient.donationCategory.findUnique({
           where: { id: Number(id) },
         }),
       res,
@@ -51,38 +45,22 @@ const getBeneficiary = async (
     next(error);
   }
 };
-const postBeneficiary = async (
+
+const postDonationCategory = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const errors = validationResult(req);
-  const {
-    shortName,
-    firstName,
-    lastName,
-    fullName,
-    age,
-    maritalStatus,
-    address,
-  } = req.body as Beneficiary;
+  const { name, carryover } = req.body as DonationCategory;
   try {
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);
     }
-
     const result = await prismaOperation(
       () =>
-        prismaClient.beneficiary.create({
-          data: {
-            short_name: shortName,
-            first_name: firstName,
-            last_name: lastName,
-            full_name: fullName,
-            age,
-            marital_status: maritalStatus,
-            address,
-          },
+        prismaClient.donationCategory.create({
+          data: { name, carryover },
         }),
       res,
       next,
@@ -94,22 +72,14 @@ const postBeneficiary = async (
   }
 };
 
-const editBeneficiary = async (
+const editDonationCategory = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const errors = validationResult(req);
-  const {
-    id,
-    shortName,
-    firstName,
-    lastName,
-    fullName,
-    age,
-    maritalStatus,
-    address,
-  }: Beneficiary = req.body;
+
+  const { id, name, carryover } = req.body as DonationCategory;
   try {
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);
@@ -117,17 +87,9 @@ const editBeneficiary = async (
 
     const result = await prismaOperation(
       () =>
-        prismaClient.beneficiary.update({
+        prismaClient.donationCategory.update({
           where: { id: Number(id) },
-          data: {
-            short_name: shortName,
-            first_name: firstName,
-            last_name: lastName,
-            full_name: fullName,
-            age,
-            marital_status: maritalStatus,
-            address,
-          },
+          data: { name, carryover },
         }),
       res,
       next,
@@ -139,7 +101,7 @@ const editBeneficiary = async (
   }
 };
 
-const deleteBeneficiary = async (
+const deleteDonationCategory = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -153,9 +115,8 @@ const deleteBeneficiary = async (
 
     const result = await prismaOperation(
       () =>
-        prismaClient.beneficiary.delete({
+        prismaClient.donationCategory.delete({
           where: { id: Number(id) },
-          include: { Expense: true },
         }),
       res,
       next,
@@ -168,9 +129,9 @@ const deleteBeneficiary = async (
 };
 
 export {
-  getBeneficiaries,
-  getBeneficiary,
-  postBeneficiary,
-  editBeneficiary,
-  deleteBeneficiary,
+  getDonationCategories,
+  getDonationCategory,
+  postDonationCategory,
+  editDonationCategory,
+  deleteDonationCategory,
 };

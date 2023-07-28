@@ -1,21 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
-import { verify } from 'jsonwebtoken';
+import { verify, JsonWebTokenError } from 'jsonwebtoken';
+import JwtError from './Errors/JwtError';
 
 const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   const token = req.get('Authorization')?.split(' ')[1];
-  // console.log(token);
   let decodedToken: any;
+  // TODO: Check to handle expired token
   try {
-    if (token) {
+    if (!token) throw new JwtError('You are not authenticated');
+    try {
       decodedToken = verify(token, 'secret');
-      req.body.userId = decodedToken.userId;
-      req.body.userRole = decodedToken.role;
-      next();
-    } else {
-     const error = new Error('Not authenticated');
-     throw error;
+    } catch (error: JsonWebTokenError | unknown) {
+      throw new JwtError('This is invalid JWT token');
     }
+    req.body.userId = decodedToken.userId;
+    req.body.userRole = decodedToken.role;
+    next();
   } catch (error) {
     next(error);
   }

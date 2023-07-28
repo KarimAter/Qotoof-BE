@@ -1,21 +1,25 @@
-/* eslint-disable consistent-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable consistent-return */
 import { Prisma } from '@prisma/client';
-import { ErrorRequestHandler, NextFunction, Response } from 'express';
-import { ValidationError } from 'express-validator';
-import { JsonWebTokenError } from 'jsonwebtoken';
+import { NextFunction, Response } from 'express';
+import DatabaseError from '../middleware/Errors/DatabaseError';
 
-async function prismaOperation(
-  callback: () => Promise<any>,
+// TODO: update for rest of Prisma errors
+// TODO: Refactor to map errors to human readable messages using errorResponse object
+
+const prismaOperation = async <T>(
+  callback: () => Promise<T>,
   res: Response,
   next: NextFunction,
-) {
+): Promise<T | void> => {
   try {
-    return res.json(await callback());
-  } catch (error) {
-    if (next) next(error);
+    const result = await callback();
+    return result;
+  } catch (error: Error | any) {
+    console.error(error);
+    next(new DatabaseError(error.code, error.meta?.cause));
   }
-}
+};
 export async function prismaQuery(callback: () => Promise<any>) {
   try {
     const result = await callback();
@@ -28,31 +32,5 @@ export async function prismaQuery(callback: () => Promise<any>) {
     return error;
   }
 }
-
-// Todo:update for Prisma errors
-export const errorHandler: ErrorRequestHandler = (
-  errors: ValidationError[] | Error | JsonWebTokenError,
-  req,
-  res,
-  next,
-) => {
-  let msg;
-  if (errors instanceof JsonWebTokenError) {
-    res.statusCode = 401;
-    msg = errors.message;
-  } else if (errors instanceof Error) {
-    msg = errors.message;
-    if (msg?.includes('database')) res.statusCode = 500;
-    else if (msg === 'Not authenticated') res.statusCode = 401;
-    else res.statusCode = 403;
-  } else {
-    res.statusCode = 400;
-    msg = errors.map((err) => err.msg);
-  }
-  res.json({
-    msg,
-  });
-  console.log('App error', msg);
-};
 
 export default prismaOperation;

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ValidationChain, body } from 'express-validator';
+import { ValidationChain, body, param } from 'express-validator';
 import {
   postDonation,
   getDonations,
@@ -9,41 +9,78 @@ import {
 } from '../controllers/donationController';
 import isAuthenticated from '../middleware/is-authenticated';
 import { isAuthorizedMethod } from '../middleware/is-authorized';
+import donationMapperMiddleware from '../middleware/donationMapper';
 
 const donationRouter = Router();
-function donationValidation(): ValidationChain[] {
-  return [
-    body('donor.id')
-      .exists()
-      .notEmpty()
-      .withMessage('Please enter a donor')
-      .isNumeric()
-      .withMessage('wrong donor'),
-    body('amount')
-      .exists()
-      .notEmpty()
-      .withMessage('Please enter amount')
-      .isFloat()
-      .withMessage('wrong amount'),
-    body('category')
-      .exists()
-      .notEmpty()
-      .withMessage('Please enter a category')
-      .isString()
-      .withMessage('amount sent as string'),
-  ];
-}
+const validateDonation = (): ValidationChain[] => [
+  body('date')
+    .if(body('date').exists().withMessage('Donation date is required'))
+    .notEmpty()
+    .withMessage('Donation date cannot be empty')
+    .bail(),
+  // .isDate()
+  // .withMessage('donation date is invalid'),
+  body('amount')
+    .exists()
+    .withMessage('Donation amount is required')
+    .bail()
+    .notEmpty()
+    .withMessage('Donation amount cannot be empty')
+    .bail()
+    .not()
+    .isString()
+    .withMessage('Donation amount must not be a string')
+    .bail()
+    .isNumeric()
+    .withMessage('Donation amount must be numeric')
+    .bail()
+    .isInt({ min: 0 })
+    .withMessage('Donation amount must be positive'),
+  body('donationCategory.id')
+    .exists()
+    .withMessage('Donation category is required')
+    .bail()
+    .notEmpty()
+    .withMessage('Donation category cannot be empty')
+    .bail()
+    .isNumeric()
+    .withMessage('Donation category ID must be numeric'),
+  body('donor.id')
+    .exists()
+    .withMessage('Donor is required')
+    .bail()
+    .notEmpty()
+    .withMessage('Donor cannot be empty')
+    .bail()
+    .isNumeric()
+    .withMessage('Donor ID must be numeric'),
+];
 
+const validateDonationId = (): ValidationChain[] => [
+  param('id').isNumeric().withMessage('Donation ID must be a numeric value'),
+];
+donationRouter.options('/', (req, res) => {
+  // Set the necessary CORS headers for the OPTIONS request
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'OPTIONS, GET, POST, PUT, DELETE',
+  );
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.sendStatus(200);
+});
+donationRouter.use(isAuthenticated);
 donationRouter
-  .post('/', isAuthenticated, donationValidation(), postDonation)
+  .post('/', validateDonation(), postDonation)
+  .put('/', validateDonation(), editDonation)
   .get(
     '/',
-    isAuthenticated,
     (req, res, next) => isAuthorizedMethod(req, res, next, 3),
     getDonations,
   )
-  .put('/', isAuthenticated, editDonation)
-  .delete('/', isAuthenticated, deleteDonation)
-  .get('/:id', isAuthenticated, getDonation);
+  .delete('/', validateDonationId(), deleteDonation)
+  .get('/:id', validateDonationId(), getDonation);
+
+donationRouter.use(donationMapperMiddleware);
 
 export default donationRouter;

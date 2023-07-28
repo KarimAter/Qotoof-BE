@@ -3,6 +3,7 @@ import { body, ValidationChain } from 'express-validator';
 import { postUser, getUsers, getUser } from '../controllers/userController';
 import UserRole from '../utils/Constants';
 import isAuthenticated from '../middleware/is-authenticated';
+import userMapperMiddleware from '../middleware/userMapper';
 
 const userRouter = Router();
 
@@ -25,9 +26,10 @@ function signUpValidation(): ValidationChain[] {
       .withMessage('Invalid Role'),
   ];
 }
+// TODO: edit and delete user
 userRouter
   .post('/login', getUser)
-  .post('/', signUpValidation(), postUser)
-  .get('/', isAuthenticated, getUsers);
+  .post('/', signUpValidation(), postUser, userMapperMiddleware)
+  .get('/', isAuthenticated, getUsers, userMapperMiddleware);
 
 export default userRouter;
