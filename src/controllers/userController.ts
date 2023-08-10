@@ -13,7 +13,7 @@ const postUser = async (req: Request, res: Response, next: NextFunction) => {
   if (!errors.isEmpty()) {
     next(errors.array());
   } else {
-    const { name, email, password, role } = req.body as User;
+    const { shortName, firstName, lastName, fullName, email, password, role } = req.body as User;
 
     if (password) {
       try {
@@ -22,7 +22,10 @@ const postUser = async (req: Request, res: Response, next: NextFunction) => {
           () =>
             prismaClient.user.create({
               data: {
-                short_name: name,
+                short_name: shortName,
+                first_name: firstName,
+                last_name: lastName,
+                full_name: fullName,
                 email,
                 role: userRoleMapper(role),
                 password: hashedPassword,
@@ -98,7 +101,7 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
         token,
         user: {
           id: loadedUser?.id,
-          name: loadedUser?.short_name,
+          shortName: loadedUser?.short_name,
           role: loadedUser?.role,
         },
       });

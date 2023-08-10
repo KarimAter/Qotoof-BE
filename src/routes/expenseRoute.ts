@@ -9,61 +9,30 @@ import {
 import isAuthenticated from '../middleware/is-authenticated';
 import { isAuthorizedMethod } from '../middleware/is-authorized';
 import expenseMapperMiddleware from '../middleware/expenseMapper';
+import {
+  validateDate,
+  validateDecimalRange,
+  validateFieldExistince,
+  validateRelationalId,
+} from '../validation/customValidators';
 
 const expenseRouter = Router();
 
 const validateExpense = (): ValidationChain[] => [
-  body('date')
-    .if(body('date').exists().withMessage('Expense date is required'))
-    .notEmpty()
-    .withMessage('Expense date cannot be empty')
-    .bail(),
-  // .isDate()
-  // .withMessage('expense date is invalid'),
-  body('amount')
-    .exists()
-    .withMessage('Expense amount is required')
-    .bail()
-    .notEmpty()
-    .withMessage('Expense amount cannot be empty')
-    .bail()
-    .not()
-    .isString()
-    .withMessage('Expense amount must not be a string')
-    .bail()
-    .isNumeric()
-    .withMessage('Expense amount must be numeric')
-    .bail()
-    .isInt({ min: 0 })
-    .withMessage('Expense amount must be positive'),
-  body('donationCategory.id')
-    .exists()
-    .withMessage('Donation category is required')
-    .bail()
-    .notEmpty()
-    .withMessage('Donation category cannot be empty')
-    .bail()
-    .isNumeric()
-    .withMessage('Donation category ID must be numeric'),
-  body('expenseCategory.id')
-    .exists()
-    .withMessage('Expense category is required')
-    .bail()
-    .notEmpty()
-    .withMessage('Expense category cannot be empty')
-    .bail()
-    .isNumeric()
-    .withMessage('Expense category ID must be numeric'),
-  body('status').if(body('status').exists().withMessage('Status is required')),
-  body('paymentType').if(
-    body('paymentType').exists().withMessage('Status is required'),
-  ),
-  body('comment').if(
-    body('comment').exists().withMessage('Status is required'),
-  ),
-  body('project').if(
-    body('project').exists().withMessage('Status is required'),
-  ),
+  validateDate('Expense'),
+  validateDecimalRange('amount', 'Expense amount', {
+    minimum: 0,
+    maximum: Infinity,
+  }),
+  validateRelationalId('donationCategory'),
+  validateRelationalId('expenseCategory'),
+
+  //  TODO: Refactor validation for these fields
+  validateFieldExistince('status'),
+  validateFieldExistince('paymentType'),
+  validateFieldExistince('comment'),
+  validateFieldExistince('project'),
+
 ];
 
 const validateExpenseId = (): ValidationChain[] => [

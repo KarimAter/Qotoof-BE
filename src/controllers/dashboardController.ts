@@ -1,6 +1,6 @@
-/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
+
 import { NextFunction, Request, Response } from 'express';
 import {
   CashInType,

@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import userRole from '../utils/Constants';
 
+export interface HumanModel {
+  id: number;
+  shortName: string;
+}
 export interface BasicModel {
   id: number;
   name: string;
@@ -20,13 +24,17 @@ export interface IBeneficiary {
 export interface IReferral {
   id: number;
   short_name: string;
-  first_name: string;
-  last_name: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
   referredDonors: IDonor[];
 }
 export interface IDonor {
   id: number;
   short_name: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
   referral: IReferral;
   donations: IDonation[];
 }
@@ -34,24 +42,13 @@ export interface IDonor {
 export interface IUser {
   id: number;
   short_name: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
   email?: string;
   password?: string;
   role: userRole;
 }
-
-// export const userMapper = (users: any[]): any[] => {
-//   const mappedUsers = users.map((user) => {
-//     const mappedUser = {
-//       id: user.id,
-//       name: user.name,
-//       //   email: user.email,
-//       //   password: user.password,
-//       //   role: user.role,
-//     };
-//     return mappedUser;
-//   });
-//   return mappedUsers;
-// };
 
 export interface IDonationCategory {
   id: number;
@@ -91,22 +88,6 @@ export interface IExpense {
   user: IUser;
   beneficiary: IBeneficiary;
 }
-// export const donationMapper = (donations: any[]): IDonation[] => {
-//   const mappedDonations = donations.map((donation) => {
-//     const mappedDonation: IDonation = {
-//       id: donation.id,
-//       date: donation.date,
-//       amount: donation.amount,
-//       category: donation.category,
-//       status: donation.status,
-//       payment: donation.payment,
-//       comment: donation.comment,
-//       donor: donation.donor,
-//     };
-//     return mappedDonation;
-//   });
-//   return mappedDonations;
-// };
 
 export type CategoryBalance = {
   category: string;

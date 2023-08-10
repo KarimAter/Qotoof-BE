@@ -10,50 +10,21 @@ import {
 import isAuthenticated from '../middleware/is-authenticated';
 import { isAuthorizedMethod } from '../middleware/is-authorized';
 import donationMapperMiddleware from '../middleware/donationMapper';
+import {
+  validateDate,
+  validateDecimalRange,
+  validateRelationalId,
+} from '../validation/customValidators';
 
 const donationRouter = Router();
 const validateDonation = (): ValidationChain[] => [
-  body('date')
-    .if(body('date').exists().withMessage('Donation date is required'))
-    .notEmpty()
-    .withMessage('Donation date cannot be empty')
-    .bail(),
-  // .isDate()
-  // .withMessage('donation date is invalid'),
-  body('amount')
-    .exists()
-    .withMessage('Donation amount is required')
-    .bail()
-    .notEmpty()
-    .withMessage('Donation amount cannot be empty')
-    .bail()
-    .not()
-    .isString()
-    .withMessage('Donation amount must not be a string')
-    .bail()
-    .isNumeric()
-    .withMessage('Donation amount must be numeric')
-    .bail()
-    .isInt({ min: 0 })
-    .withMessage('Donation amount must be positive'),
-  body('donationCategory.id')
-    .exists()
-    .withMessage('Donation category is required')
-    .bail()
-    .notEmpty()
-    .withMessage('Donation category cannot be empty')
-    .bail()
-    .isNumeric()
-    .withMessage('Donation category ID must be numeric'),
-  body('donor.id')
-    .exists()
-    .withMessage('Donor is required')
-    .bail()
-    .notEmpty()
-    .withMessage('Donor cannot be empty')
-    .bail()
-    .isNumeric()
-    .withMessage('Donor ID must be numeric'),
+  validateDate('Donation'),
+  validateDecimalRange('amount', 'Donation amount', {
+    minimum: 0,
+    maximum: Infinity,
+  }),
+  validateRelationalId('donationCategory'),
+  validateRelationalId('donor'),
 ];
 
 const validateDonationId = (): ValidationChain[] => [

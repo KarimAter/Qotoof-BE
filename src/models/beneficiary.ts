@@ -1,5 +1,5 @@
 /* eslint-disable import/no-cycle */
-import { IBeneficiary, IExpense } from './interfaces';
+import { HumanModel, IBeneficiary, IExpense } from './interfaces';
 
 export interface Beneficiary {
   id: number;
@@ -16,7 +16,7 @@ export interface Beneficiary {
 export const beneficiaryMapper = (
   beneficiaries: IBeneficiary[],
   referenced: boolean,
-): Beneficiary[] => {
+): Beneficiary[] | HumanModel[] => {
   const beneficiariesDTOs = beneficiaries.map((beneficiary) => {
     const {
       id,

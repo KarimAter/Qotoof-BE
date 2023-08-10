@@ -12,7 +12,7 @@ const postReferral = async (
 ) => {
   const errors = validationResult(req);
 
-  const { shortName, firstName, lastName } = req.body as Referral;
+  const { shortName, firstName, lastName, fullName } = req.body as Referral;
   try {
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);
@@ -25,6 +25,7 @@ const postReferral = async (
             short_name: shortName,
             first_name: firstName,
             last_name: lastName,
+            full_name: fullName,
           },
         }),
       res,

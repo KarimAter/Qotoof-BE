@@ -30,6 +30,9 @@ model Beneficiary {
 model Donor {
   id          Int        @id @unique @default(autoincrement())
   short_name  String     @unique
+  first_name  String?
+  last_name   String?
+  full_name   String?
   referral    Referral   @relation(fields: [referral_id], references: [id])
   donations   Donation[]
   referral_id Int
@@ -91,6 +94,9 @@ model Expense {
 model User {
   id                Int       @id @unique @default(autoincrement())
   short_name        String    @unique
+  first_name        String?
+  last_name         String?
+  full_name         String?
   email             String?
   password          String?
   role              UserRole
@@ -104,6 +110,7 @@ model Referral {
   short_name      String   @unique
   first_name      String?
   last_name       String?
+  full_name       String?
   referred_donors Donor[]
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt

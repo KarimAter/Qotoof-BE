@@ -8,7 +8,7 @@ import ValidationError from '../middleware/Errors/InvalidRequestError';
 const postDonor = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
 
-  const { name: shortName, referral } = req.body as Donor;
+  const { shortName, firstName, lastName, fullName, referral } = req.body as Donor;
   try {
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);
@@ -17,7 +17,13 @@ const postDonor = async (req: Request, res: Response, next: NextFunction) => {
     const result = await prismaOperation(
       () =>
         prismaClient.donor.create({
-          data: { short_name: shortName, referral_id: referral.id },
+          data: {
+            short_name: shortName,
+            first_name: firstName,
+            last_name: lastName,
+            full_name: fullName,
+            referral_id: referral.id,
+          },
           include: { referral: true },
         }),
       res,
@@ -90,7 +96,7 @@ const deleteDonor = async (req: Request, res: Response, next: NextFunction) => {
 const editDonor = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
 
-  const { id, name: shortName, referral } = req.body as Donor;
+  const { id, shortName, referral } = req.body as Donor;
   try {
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);

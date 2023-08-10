@@ -1,8 +1,8 @@
-import { BasicModel, IExpense } from './interfaces';
+import { BasicModel, HumanModel, IExpense } from './interfaces';
 import { donationCategoryMapper } from './donationCategory';
 import { expenseCategoryMapper } from './expenseCategory';
 import { userMapper } from './user';
-import { Beneficiary, beneficiaryMapper } from './beneficiary';
+import { beneficiaryMapper } from './beneficiary';
 
 export interface Expense {
   id: string;
@@ -14,8 +14,8 @@ export interface Expense {
   paymentType?: string;
   comment?: string;
   project?: string;
-  user: BasicModel;
-  beneficiary: Beneficiary;
+  user: HumanModel;
+  beneficiary: HumanModel;
 }
 export const expenseMapper = (expenses: IExpense[]): Expense[] => {
   const expenseDTOs = expenses.map((expense) => {
@@ -31,17 +31,18 @@ export const expenseMapper = (expenses: IExpense[]): Expense[] => {
       user,
       beneficiary,
     } = expense;
-    console.log('Expense Mapper:::', expense);
-    console.log(
-      'expenseCategoryMapper:::',
-      expenseCategoryMapper([expense.expense_category], true),
-    );
     const expenseDTO: Expense = {
       id,
       date,
       amount,
-      donationCategory: donationCategoryMapper([expense.donation_category], true)[0],
-      expenseCategory: expenseCategoryMapper([expense.expense_category], true)[0],
+      donationCategory: donationCategoryMapper(
+        [expense.donation_category],
+        true,
+      )[0],
+      expenseCategory: expenseCategoryMapper(
+        [expense.expense_category],
+        true,
+      )[0],
       status,
       paymentType,
       comment,

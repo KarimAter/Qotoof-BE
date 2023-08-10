@@ -10,6 +10,7 @@ import {
 import isAuthenticated from '../middleware/is-authenticated';
 import { isAuthorized } from '../middleware/is-authorized';
 import referralMapperMiddleware from '../middleware/referralMapper';
+import { validateId } from '../validation/customValidators';
 
 const referralRouter = Router();
 
@@ -47,23 +48,13 @@ const validateReferral = (): ValidationChain[] => [
     .isLength({ min: 3 })
     .withMessage('Last name must be at least 3 characters long'),
 ];
-
-const validateReferralId = (): ValidationChain[] => [
-  param('id')
-    // .not()
-    // .isString()
-    // .withMessage('id must not be a string')
-    // .bail()
-    .isNumeric()
-    .withMessage('Referral ID must be a numeric value'),
-];
 referralRouter.use(isAuthenticated);
 referralRouter
   .post('/', validateReferral(), postReferral)
-  .get('/:id', isAuthorized, validateReferralId(), getReferral)
   .get('/', isAuthorized, getReferrals)
   .put('/', validateReferral(), editReferral)
-  .delete('/:id', validateReferralId(), deleteReferral);
+  .get('/:id', isAuthorized, validateId('Referral'), getReferral)
+  .delete('/:id', validateId('Referral'), deleteReferral);
 referralRouter.use(referralMapperMiddleware);
 
 export default referralRouter;

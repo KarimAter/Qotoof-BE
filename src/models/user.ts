@@ -1,11 +1,14 @@
 import { UserRole } from '@prisma/client';
 import userRole from '../utils/Constants';
 
-import { BasicModel, IUser } from './interfaces';
+import { HumanModel, IUser } from './interfaces';
 
 export interface User {
   id: number;
-  name: string;
+  shortName: string;
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
   email?: string;
   password?: string;
   role: userRole;
@@ -44,18 +47,28 @@ export const userRoleMapper = (uRole: userRole): UserRole => {
 export const userMapper = (
   users: IUser[],
   referenced: boolean,
-): User[] | BasicModel[] => {
+): User[] | HumanModel[] => {
   const userDTOs = users.map((user) => {
-    const { id, short_name: name, role } = user;
+    const {
+      id,
+      short_name: shortName,
+      first_name: firstName,
+      last_name: lastName,
+      full_name: fullName,
+      role,
+    } = user;
     if (!referenced) {
       const userDTO: User = {
         id,
-        name,
+        shortName,
+        firstName,
+        lastName,
+        fullName,
         role,
       };
       return userDTO;
     }
-    return { id, name };
+    return { id, shortName };
   });
   return userDTOs;
 };
