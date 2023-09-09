@@ -1,8 +1,9 @@
 /* eslint-disable import/no-cycle */
-import { HumanModel, IBeneficiary, IExpense } from './interfaces';
+import { Expense } from './expense';
+import { BasicModel } from './interfaces';
 
 export interface Beneficiary {
-  id: number;
+  id: string;
   shortName: string;
   firstName?: string;
   lastName?: string;
@@ -10,40 +11,5 @@ export interface Beneficiary {
   age?: number;
   maritalStatus?: string;
   address?: string;
-  expenses?: IExpense[];
+  expenses?: Expense[] | BasicModel[];
 }
-
-export const beneficiaryMapper = (
-  beneficiaries: IBeneficiary[],
-  referenced: boolean,
-): Beneficiary[] | HumanModel[] => {
-  const beneficiariesDTOs = beneficiaries.map((beneficiary) => {
-    const {
-      id,
-      short_name: shortName,
-      first_name: firstName,
-      last_name: lastName,
-      full_name: fullName,
-      age,
-      marital_status: maritalStatus,
-      address,
-      expenses,
-    } = beneficiary;
-    if (!referenced) {
-      const beneficiariesDTO: Beneficiary = {
-        id,
-        shortName,
-        firstName,
-        lastName,
-        fullName,
-        age,
-        maritalStatus,
-        address,
-        expenses,
-      };
-      return beneficiariesDTO;
-    }
-    return { id, shortName };
-  });
-  return beneficiariesDTOs;
-};

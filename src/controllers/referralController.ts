@@ -22,10 +22,10 @@ const postReferral = async (
       () =>
         prismaClient.referral.create({
           data: {
-            short_name: shortName,
-            first_name: firstName,
-            last_name: lastName,
-            full_name: fullName,
+            shortName,
+            firstName,
+            lastName,
+            fullName,
           },
         }),
       res,
@@ -60,7 +60,7 @@ const getReferral = async (req: Request, res: Response, next: NextFunction) => {
       throw new ValidationError('Invalid input', errors);
     }
     const result = await prismaOperation(
-      () => prismaClient.referral.findUnique({ where: { id: Number(id) } }),
+      () => prismaClient.referral.findUnique({ where: { id } }),
       res,
       next,
     );
@@ -86,7 +86,7 @@ const deleteReferral = async (
     const result = await prismaOperation(
       () =>
         prismaClient.referral.delete({
-          where: { id: Number(id) },
+          where: { id },
         }),
       res,
       next,
@@ -104,8 +104,9 @@ const editReferral = async (
   next: NextFunction,
 ) => {
   const errors = validationResult(req);
+  const { id } = req.params;
 
-  const { id, shortName, firstName, lastName } = req.body as Referral;
+  const { shortName, firstName, lastName, fullName } = req.body as Referral;
   try {
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);
@@ -116,9 +117,10 @@ const editReferral = async (
         prismaClient.referral.update({
           where: { id },
           data: {
-            short_name: shortName,
-            first_name: firstName,
-            last_name: lastName,
+            shortName,
+            firstName,
+            lastName,
+            fullName,
           },
         }),
       res,

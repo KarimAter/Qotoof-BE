@@ -1,29 +1,32 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import { Beneficiary } from '../models/beneficiary';
+import { NextFunction, Request, Response } from 'express';
 import prismaClient from '../utils/databaseConnector';
 import prismaOperation from '../utils/helperFunctions';
 import ValidationError from '../middleware/Errors/InvalidRequestError';
+import { ITransactionType } from '../models/interfaces';
 
-const getBeneficiaries = async (
+const getTransactionTypes = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const result = await prismaOperation(
-    () => prismaClient.beneficiary.findMany({}),
-    // prismaClient.expense.aggregate({
-    //   _sum: { amount: true },
-    // }),
+    () =>
+      prismaClient.transactionType.findMany({
+        select: {
+          id: true,
+          name: true,
+        },
+      }),
     res,
     next,
   );
+
   req.body = result;
   next();
 };
 
-const getBeneficiary = async (
+const getTransactionType = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -37,18 +40,11 @@ const getBeneficiary = async (
 
     const result = await prismaOperation(
       () =>
-        prismaClient.beneficiary.findUnique({
+        prismaClient.transactionType.findUnique({
           where: { id },
-          include: {
-            Expense: {
-              select: {
-                donationCategory: { select: { name: true } },
-                expenseCategory: { select: { name: true } },
-                amount: true,
-                status: { select: { name: true } },
-              },
-            },
-            _count: true,
+          select: {
+            id: true,
+            name: true,
           },
         }),
       res,
@@ -60,38 +56,22 @@ const getBeneficiary = async (
     next(error);
   }
 };
-const postBeneficiary = async (
+
+const postTransactionType = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const errors = validationResult(req);
-  const {
-    shortName,
-    firstName,
-    lastName,
-    fullName,
-    age,
-    maritalStatus,
-    address,
-  } = req.body as Beneficiary;
+  const { name } = req.body as ITransactionType;
   try {
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);
     }
-
     const result = await prismaOperation(
       () =>
-        prismaClient.beneficiary.create({
-          data: {
-            shortName,
-            firstName,
-            lastName,
-            fullName,
-            age,
-            maritalStatus,
-            address,
-          },
+        prismaClient.transactionType.create({
+          data: { name },
         }),
       res,
       next,
@@ -103,41 +83,25 @@ const postBeneficiary = async (
   }
 };
 
-const editBeneficiary = async (
+const editTransactionType = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const errors = validationResult(req);
-  const {
-    shortName,
-    firstName,
-    lastName,
-    fullName,
-    age,
-    maritalStatus,
-    address,
-  }: Beneficiary = req.body;
-  try {
-    const { id } = req.params;
+  const { id } = req.params;
 
+  const { name } = req.body as ITransactionType;
+  try {
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);
     }
 
     const result = await prismaOperation(
       () =>
-        prismaClient.beneficiary.update({
+        prismaClient.transactionType.update({
           where: { id },
-          data: {
-            shortName,
-            firstName,
-            lastName,
-            fullName,
-            age,
-            maritalStatus,
-            address,
-          },
+          data: { name },
         }),
       res,
       next,
@@ -149,7 +113,7 @@ const editBeneficiary = async (
   }
 };
 
-const deleteBeneficiary = async (
+const deleteTransactionType = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -163,9 +127,8 @@ const deleteBeneficiary = async (
 
     const result = await prismaOperation(
       () =>
-        prismaClient.beneficiary.delete({
+        prismaClient.transactionType.delete({
           where: { id },
-          // include: { Expense: true },
         }),
       res,
       next,
@@ -178,9 +141,9 @@ const deleteBeneficiary = async (
 };
 
 export {
-  getBeneficiaries,
-  getBeneficiary,
-  postBeneficiary,
-  editBeneficiary,
-  deleteBeneficiary,
+  getTransactionTypes,
+  getTransactionType,
+  postTransactionType,
+  editTransactionType,
+  deleteTransactionType,
 };

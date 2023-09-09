@@ -50,11 +50,16 @@ const validateReferral = (): ValidationChain[] => [
 ];
 referralRouter.use(isAuthenticated);
 referralRouter
-  .post('/', validateReferral(), postReferral)
+  .post('/', postReferral)
   .get('/', isAuthorized, getReferrals)
-  .put('/', validateReferral(), editReferral)
-  .get('/:id', isAuthorized, validateId('Referral'), getReferral)
-  .delete('/:id', validateId('Referral'), deleteReferral);
+  .get('/:id', isAuthorized, getReferral)
+  .put('/:id', editReferral)
+  .delete('/:id', deleteReferral);
+  // .post('/', validateReferral(), postReferral)
+  // .get('/', isAuthorized, getReferrals)
+  // .put('/', validateReferral(), editReferral)
+  // .get('/:id', isAuthorized, validateId('Referral'), getReferral)
+  // .delete('/:id', validateId('Referral'), deleteReferral);
 referralRouter.use(referralMapperMiddleware);
 
 export default referralRouter;

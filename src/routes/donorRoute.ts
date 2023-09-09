@@ -23,27 +23,18 @@ const validateDonor = (): ValidationChain[] => [
   validateOptionalName('firstName', 'Donor first name'),
   validateOptionalName('lastName', 'Donor last name'),
   validateOptionalName('fullName', 'Donor full name'),
-  validateRelationalId('referral'),
+  // validateRelationalId('referral', true),
+  // TODO: Library for validating relational CUIDs
 ];
 
-donorRouter.options('/', (req, res) => {
-  // Set the necessary CORS headers for the OPTIONS request
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader(
-    'Access-Control-Allow-Methods',
-    'OPTIONS, GET, POST, PUT, DELETE',
-  );
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.sendStatus(200);
-});
 donorRouter.use(isAuthenticated);
 
 donorRouter
-  .post('/', validateDonor(), postDonor)
-  .put('/', validateDonor(), editDonor)
+  .post('/', postDonor)
   .get('/', isAuthorized, getDonors)
-  .get('/:id', isAuthorized, validateId('Donor'), getDonor)
-  .delete('/:id', validateId('Donor'), deleteDonor);
+  .get('/:id', isAuthorized, getDonor)
+  .put('/:id', editDonor)
+  .delete('/:id', deleteDonor);
 donorRouter.use(donorMapperMiddleware);
 
 export default donorRouter;

@@ -13,107 +13,165 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// TODO: make document Ids unique
+
 model Beneficiary {
-  id             Int       @id @unique @default(autoincrement())
-  short_name     String    @unique
-  first_name     String?
-  last_name      String?
-  full_name      String?
-  age            Int?
-  marital_status String?
-  address        String?
-  Expense        Expense[]
-  created_at     DateTime  @default(now())
-  updated_at     DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  shortName     String    @unique @map("short_name")
+  firstName     String?   @map("first_name")
+  lastName      String?   @map("last_name")
+  fullName      String?   @map("full_name")
+  age           Int?
+  maritalStatus String?   @map("marital_status")
+  address       String?
+  Expense       Expense[]
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
 }
 
 model Donor {
-  id          Int        @id @unique @default(autoincrement())
-  short_name  String     @unique
-  first_name  String?
-  last_name   String?
-  full_name   String?
-  referral    Referral   @relation(fields: [referral_id], references: [id])
-  donations   Donation[]
-  referral_id Int
-  created_at  DateTime   @default(now())
-  updated_at  DateTime   @updatedAt
-}
-
-model DonationCategory {
-  id         Int        @id @default(autoincrement())
-  name       String     @unique
-  carryover  Float
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
+  id         String     @id @default(cuid())
+  shortName  String     @unique @map("short_name")
+  firstName  String?    @map("first_name")
+  lastName   String?    @map("last_name")
+  fullName   String?    @map("full_name")
+  referral   Referral   @relation(fields: [referralId], references: [id])
   donations  Donation[]
-  Expense    Expense[]
+  referralId String     @map("referral_id")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
 }
 
-model ExpenseCategory {
-  id         Int       @id @default(autoincrement())
-  name       String    @unique
-  carryover  Float
-  expenses   Expense[]
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
+model Category {
+  id                   String        @id @default(cuid())
+  name                 String        @unique
+  inOnly               Boolean       @default(false) @map("in_only")
+  parentId             String        @default("") @map("parent_id")
+  level                Int           @default(0)
+  carryover            Float
+  current_transactions Transaction[] @relation(name: "CurrentCategory")
+  target_transactions  Transaction[] @relation(name: "TargetCategory")
+  Donation             Donation[]
+  ExpenseFrom          Expense[]     @relation(name: "DonationCategory")
+  ExpenseTo            Expense[]     @relation(name: "ExpenseCategory")
 }
 
 model Donation {
-  id                   String           @id @default(uuid())
-  date                 DateTime?
-  amount               Float
-  donation_category    DonationCategory @relation(fields: [donation_category_id], references: [id])
-  donor                Donor            @relation(fields: [donor_id], references: [id])
-  donation_category_id Int
-  donor_id             Int
-  created_at           DateTime         @default(now())
-  updated_at           DateTime         @updatedAt
+  id                 String           @id @default(uuid())
+  serialNumber       Int              @unique @default(autoincrement()) @map("serial_number")
+  date               DateTime?
+  amount             Float
+  donor              Donor            @relation(fields: [donorId], references: [id])
+  donationCategory   Category         @relation(fields: [donationCategoryId], references: [id])
+  paymentContainer   PaymentContainer @relation(fields: [containerId], references: [id])
+  status             Status           @relation(fields: [statusId], references: [id])
+  comment            String?
+  donorId            String           @map("donor_id")
+  donationCategoryId String           @map("donation_category_id")
+  containerId        String           @map("container_id")
+  statusId           String           @map("status_id")
+  receiptId          String?          @map("receipt_id")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  updatedAt          DateTime         @updatedAt @map("updated_at")
 }
 
 model Expense {
-  id                   String           @id @default(uuid())
-  date                 DateTime?
-  amount               Float
-  donation_category    DonationCategory @relation(fields: [donation_category_id], references: [id])
-  expense_category     ExpenseCategory  @relation(fields: [expense_category_id], references: [id])
-  beneficiary          Beneficiary      @relation(fields: beneficiary_id, references: id, onDelete: Cascade, onUpdate: Cascade)
-  user                 User             @relation(fields: [user_id], references: [id])
-  status               String?
-  payment_type         String?
-  comment              String?
-  project              String?
-  user_id              Int
-  beneficiary_id       Int
-  donation_category_id Int
-  expense_category_id  Int
-  created_at           DateTime         @default(now())
-  updated_at           DateTime         @updatedAt
+  id                 String           @id @default(uuid())
+  serialNumber       Int              @unique @default(autoincrement()) @map("serial_number")
+  date               DateTime?
+  amount             Float
+  donationCategory   Category         @relation(name: "DonationCategory", map: "donation_category", fields: [donationCategoryId], references: [id])
+  expenseCategory    Category         @relation(name: "ExpenseCategory", map: "expense_category", fields: [expenseCategoryId], references: [id])
+  paymentContainer   PaymentContainer @relation(fields: [containerId], references: [id])
+  beneficiary        Beneficiary      @relation(fields: [beneficiaryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  user               User             @relation(fields: [userId], references: [id])
+  status             Status           @relation(fields: [statusId], references: [id])
+  donationCategoryId String           @map("donation_category_id")
+  expenseCategoryId  String           @map("expense_category_id")
+  statusId           String
+  containerId        String           @map("container_id")
+  beneficiaryId      String           @map("beneficiary_id")
+  userId             String           @map("user_id")
+  project            String?
+  comment            String?
+  invoiceId          String?          @map("invoice_id")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  updatedAt          DateTime         @updatedAt @map("updated_at")
+}
+
+model Transaction {
+  id                 String           @id @default(uuid())
+  date               DateTime?
+  amount             Float
+  currentCategory    Category         @relation(name: "CurrentCategory", map: "current_category_transactions", fields: [currentCategoryId], references: [id])
+  targetCategory     Category?         @relation(name: "TargetCategory", map: "target_category_transactions", fields: [targetCategoryId], references: [id])
+  currentContainer   PaymentContainer @relation(name: "CurrentContainer", map: "current_container_transactions", fields: [currentContainerId], references: [id])
+  targetContainer    PaymentContainer @relation(name: "TargetContainer", map: "target_container_transactions", fields: [targetContainerId], references: [id])
+  TransactionType    TransactionType  @relation(fields: [transactionTypeId], references: [id])
+  Status             Status           @relation(fields: [statusId], references: [id])
+  currentCategoryId  String           @map("current_category_id")
+  targetCategoryId   String?           @map("target_category_id")
+  currentContainerId String           @map("current_container_id")
+  targetContainerId  String           @map("target_container_id")
+  transactionTypeId  String
+  statusId           String
+  documentId         String?          @map("document_id")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  updatedAt          DateTime         @updatedAt @map("updated_at")
 }
 
 model User {
-  id                Int       @id @unique @default(autoincrement())
-  short_name        String    @unique
-  first_name        String?
-  last_name         String?
-  full_name         String?
-  email             String?
-  password          String?
-  role              UserRole
-  recieved_expenses Expense[]
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
+  id               String    @id @default(cuid())
+  shortName        String    @unique @map("short_name")
+  firstName        String?   @map("first_name")
+  lastName         String?   @map("last_name")
+  fullName         String?   @map("full_name")
+  email            String
+  password         String
+  role             UserRole
+  recievedExpenses Expense[]
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
 }
 
 model Referral {
-  id              Int      @id @unique @default(autoincrement())
-  short_name      String   @unique
-  first_name      String?
-  last_name       String?
-  full_name       String?
+  id              String   @id @default(cuid())
+  shortName       String   @unique @map("short_name")
+  firstName       String?  @map("first_name")
+  lastName        String?  @map("last_name")
+  fullName        String?  @map("full_name")
   referred_donors Donor[]
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+}
+
+model PaymentContainer {
+  id                  String        @id @default(cuid())
+  name                String        @unique
+  Expense             Expense[]
+  Donation            Donation[]
+  currentTransactions Transaction[] @relation(name: "CurrentContainer")
+  targetTransactions  Transaction[] @relation(name: "TargetContainer")
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+}
+
+model TransactionType {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  transactions Transaction[]
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+}
+
+model Status {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  transactions Transaction[]
+  Donation     Donation[]
+  Expense      Expense[]
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
 }
 
 enum UserRole {

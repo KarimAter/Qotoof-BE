@@ -1,10 +1,10 @@
 import { UserRole } from '@prisma/client';
 import userRole from '../utils/Constants';
-
 import { HumanModel, IUser } from './interfaces';
+import { arrayMapper } from '../utils/helperFunctions';
 
 export interface User {
-  id: number;
+  id: string;
   shortName: string;
   firstName?: string;
   lastName?: string;
@@ -45,18 +45,12 @@ export const userRoleMapper = (uRole: userRole): UserRole => {
 };
 
 export const userMapper = (
-  users: IUser[],
+  userEntities: IUser[] | IUser,
   referenced: boolean,
 ): User[] | HumanModel[] => {
+  const users = arrayMapper(userEntities);
   const userDTOs = users.map((user) => {
-    const {
-      id,
-      short_name: shortName,
-      first_name: firstName,
-      last_name: lastName,
-      full_name: fullName,
-      role,
-    } = user;
+    const { id, shortName, firstName, lastName, fullName, role } = user;
     if (!referenced) {
       const userDTO: User = {
         id,

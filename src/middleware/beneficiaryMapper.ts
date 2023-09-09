@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { beneficiaryMapper } from '../models/beneficiary';
+// import { beneficiaryMapper } from '../models/beneficiary';
 import { IBeneficiary } from '../models/interfaces';
+import { arrayMapper } from '../utils/helperFunctions';
 
 const beneficiaryMapperMiddleware = (
   req: Request,
@@ -9,14 +10,7 @@ const beneficiaryMapperMiddleware = (
 ) => {
   const beneficiaryEntity: IBeneficiary[] | IBeneficiary = req.body;
 
-  return res.json(
-    beneficiaryMapper(
-      Array.isArray(beneficiaryEntity)
-        ? beneficiaryEntity
-        : [beneficiaryEntity],
-      false,
-    ),
-  );
+  return res.json(arrayMapper(beneficiaryEntity));
 };
 
 export default beneficiaryMapperMiddleware;

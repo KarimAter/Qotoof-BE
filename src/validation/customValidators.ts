@@ -1,4 +1,4 @@
-import { body, param } from 'express-validator';
+import { ValidationChain, body, param } from 'express-validator';
 import UserRole from '../utils/Constants';
 import { capitalize } from '../utils/helperFunctions';
 
@@ -86,13 +86,29 @@ const validateDecimalRange = (
     })
     .withMessage(`${entityName} must be greater than ${range.minimum}`);
 
+const validateIsRequired = (
+  validationParam: string,
+  entityName: string,
+  isRequired?: boolean,
+) =>
+  (isRequired
+    ? body(validationParam)
+        .exists()
+        .withMessage(`${entityName} is required`)
+        .bail()
+    : body(validationParam).if(
+        body(validationParam)
+          .exists()
+          .withMessage(`${entityName} date is required`),
+      ));
+
 const validateOneOf = (
   validationParam: string,
   entityName: string,
   options: string[],
+  isRequired?: boolean,
 ) =>
-  body(validationParam)
-    .if(body(validationParam).exists().withMessage(`${entityName} is required`))
+  validateIsRequired(validationParam, entityName, isRequired)
     .notEmpty()
     .withMessage(`${entityName} cannot be empty`)
     .bail()

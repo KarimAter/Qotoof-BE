@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
+import { randomUUID } from 'crypto';
 import prismaClient from '../utils/databaseConnector';
 import prismaOperation from '../utils/helperFunctions';
 import { Expense } from '../models/expense';
@@ -12,11 +13,12 @@ const postExpense = async (req: Request, res: Response, next: NextFunction) => {
     donationCategory,
     expenseCategory,
     comment,
-    paymentType,
+    paymentContainer,
     project,
     status,
     user,
     beneficiary,
+    invoiceId,
   }: Expense = req.body;
 
   const errors = validationResult(req);
@@ -24,28 +26,60 @@ const postExpense = async (req: Request, res: Response, next: NextFunction) => {
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);
     }
+
+    const xx = randomUUID();
+// TODO: Add transactional logic
     const result = await prismaOperation(
       () =>
-        prismaClient.expense.create({
-          data: {
-            date,
-            amount,
-            comment,
-            payment_type: paymentType,
-            project,
-            status,
-            donation_category_id: donationCategory.id,
-            expense_category_id: expenseCategory.id,
-            user_id: user.id,
-            beneficiary_id: beneficiary.id,
-          },
-          include: {
-            donation_category: true,
-            expense_category: true,
-            user: true,
-            beneficiary: true,
-          },
+        prismaClient.$transaction(async (tx) => {
+          const transactionalExpense = tx.expense.create({
+            data: {
+              date: new Date(date),
+              amount,
+              comment,
+              project,
+              statusId: status.id,
+              donationCategoryId: donationCategory.id,
+              expenseCategoryId: expenseCategory.id,
+              containerId: paymentContainer.id,
+              userId: user.id,
+              beneficiaryId: beneficiary.id,
+              invoiceId,
+            },
+            select: {
+              id: true,
+              serialNumber: true,
+              date: true,
+              amount: true,
+              donationCategory: { select: { name: true } },
+              expenseCategory: { select: { name: true } },
+              beneficiary: { select: { shortName: true } },
+              paymentContainer: { select: { name: true } },
+              status: { select: { name: true } },
+              comment: true,
+              project: true,
+              user: { select: { shortName: true } },
+              invoiceId: true,
+            },
+          });
+          // TODO: To figure out a solution for the hardcoded transactionTypeId
+          const trans = await tx.transaction.create({
+            data: {
+              id: (await transactionalExpense).id,
+              date: new Date(date),
+              amount: amount * -1,
+              currentCategoryId: donationCategory.id,
+              targetCategoryId: expenseCategory.id,
+              currentContainerId: paymentContainer.id,
+              targetContainerId: paymentContainer.id,
+              transactionTypeId: 'cllem28lw0000c4ehh6xba2ro',
+              statusId: status.id,
+              documentId: invoiceId,
+            },
+          });
+          return transactionalExpense;
         }),
+
       res,
       next,
     );
@@ -59,14 +93,18 @@ const getExpenses = async (req: Request, res: Response, next: NextFunction) => {
   const result = await prismaOperation(
     () =>
       prismaClient.expense.findMany({
-        // include: { referral: { select: { short_name: true } } },
-        include: {
-          // donation_category: { select: { id: true, name: true } },
-          // donor: { select: { id: true, short_name: true } },
-          donation_category: true,
-          expense_category: true,
-          user: true,
-          beneficiary: true,
+        select: {
+          serialNumber: true,
+          date: true,
+          amount: true,
+          donationCategory: { select: { name: true } },
+          expenseCategory: { select: { name: true } },
+          beneficiary: { select: { shortName: true } },
+          paymentContainer: { select: { name: true } },
+          status: { select: { name: true } },
+          comment: true,
+          project: true,
+          user: { select: { shortName: true } },
         },
       }),
     res,
@@ -85,7 +123,23 @@ const getExpense = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const result = await prismaOperation(
-      () => prismaClient.expense.findUnique({ where: { id } }),
+      () =>
+        prismaClient.expense.findUnique({
+          where: { id },
+          select: {
+            serialNumber: true,
+            date: true,
+            amount: true,
+            donationCategory: { select: { name: true } },
+            expenseCategory: { select: { name: true } },
+            beneficiary: { select: { shortName: true } },
+            paymentContainer: { select: { name: true } },
+            status: { select: { name: true } },
+            comment: true,
+            project: true,
+            user: { select: { shortName: true } },
+          },
+        }),
       res,
       next,
     );
@@ -101,20 +155,23 @@ const getExpense = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const editExpense = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+
   const errors = validationResult(req);
 
   const {
-    id,
+    serialNumber,
+    date,
     amount,
     expenseCategory,
     donationCategory,
     comment,
-    date,
     beneficiary,
-    paymentType,
+    paymentContainer,
     project,
     user,
     status,
+    invoiceId,
   }: Expense = req.body;
 
   try {
@@ -124,21 +181,57 @@ const editExpense = async (req: Request, res: Response, next: NextFunction) => {
 
     const result = await prismaOperation(
       () =>
-        prismaClient.expense.update({
-          where: { id: String(id) },
-          data: {
-            amount,
-            beneficiary_id: beneficiary.id,
-            donation_category_id: donationCategory.id,
-            expense_category_id: expenseCategory.id,
-            comment,
-            date,
-            payment_type: paymentType,
-            project,
-            status,
-            user_id: user.id,
-          },
+        prismaClient.$transaction(async (tx) => {
+          const transactionalExpense = tx.expense.update({
+            where: { id },
+            data: {
+              date: new Date(date),
+              amount,
+              comment,
+              project,
+              statusId: status.id,
+              donationCategoryId: donationCategory.id,
+              expenseCategoryId: expenseCategory.id,
+              containerId: paymentContainer.id,
+              userId: user.id,
+              beneficiaryId: beneficiary.id,
+              invoiceId,
+              serialNumber,
+            },
+            select: {
+              id: true,
+              serialNumber: true,
+              date: true,
+              amount: true,
+              donationCategory: { select: { name: true } },
+              expenseCategory: { select: { name: true } },
+              beneficiary: { select: { shortName: true } },
+              paymentContainer: { select: { name: true } },
+              status: { select: { name: true } },
+              comment: true,
+              project: true,
+              user: { select: { shortName: true } },
+              invoiceId: true,
+            },
+          });
+
+          const trans = await tx.transaction.update({
+            where: { id },
+            data: {
+              date: new Date(date),
+              amount: amount * -1,
+              currentCategoryId: donationCategory.id,
+              targetCategoryId: expenseCategory.id,
+              currentContainerId: paymentContainer.id,
+              targetContainerId: paymentContainer.id,
+              transactionTypeId: 'cllem28lw0000c4ehh6xba2ro',
+              statusId: status.id,
+              documentId: invoiceId,
+            },
+          });
+          return transactionalExpense;
         }),
+
       res,
       next,
     );
@@ -163,9 +256,34 @@ const deleteExpense = async (
 
     const result = await prismaOperation(
       () =>
-        prismaClient.expense.deleteMany({
-          where: { id },
+        prismaClient.$transaction(async (tx) => {
+          const transactionalExpense = tx.expense.delete({
+            where: { id },
+            select: {
+              id: true,
+              serialNumber: true,
+              date: true,
+              amount: true,
+              donationCategory: { select: { name: true } },
+              expenseCategory: { select: { name: true } },
+              beneficiary: { select: { shortName: true } },
+              paymentContainer: { select: { name: true } },
+              status: { select: { name: true } },
+              comment: true,
+              project: true,
+              user: { select: { shortName: true } },
+              invoiceId: true,
+            },
+          });
+
+          const trans = await tx.transaction.delete({
+            where: {
+              id: (await transactionalExpense).id,
+            },
+          });
+          return transactionalExpense;
         }),
+
       res,
       next,
     );

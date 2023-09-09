@@ -1,58 +1,25 @@
-import { BasicModel, HumanModel, IExpense } from './interfaces';
-import { donationCategoryMapper } from './donationCategory';
-import { expenseCategoryMapper } from './expenseCategory';
-import { userMapper } from './user';
-import { beneficiaryMapper } from './beneficiary';
+/* eslint-disable import/no-cycle */
+import { Beneficiary } from './beneficiary';
+import { Category } from './category';
+import { BasicModel, HumanModel } from './interfaces';
+import { PaymentContainer } from './paymentContainer';
+import { Status } from './status';
+import { User } from './user';
 
 export interface Expense {
   id: string;
+  serialNumber: number;
   date: string;
   amount: number;
-  donationCategory: BasicModel;
-  expenseCategory: BasicModel;
-  status?: string;
-  paymentType?: string;
-  comment?: string;
+  donationCategory: BasicModel | Category;
+  expenseCategory: BasicModel | Status | BasicModel;
+  paymentContainer: PaymentContainer | BasicModel;
+  beneficiary: Beneficiary | HumanModel;
+  user: User | HumanModel;
+  status: Status | BasicModel;
   project?: string;
-  user: HumanModel;
-  beneficiary: HumanModel;
+  comment?: string;
+  invoiceId?: string;
 }
-export const expenseMapper = (expenses: IExpense[]): Expense[] => {
-  const expenseDTOs = expenses.map((expense) => {
-    const {
-      id,
-      date,
-      amount,
-
-      status,
-      paymentType,
-      comment,
-      project,
-      user,
-      beneficiary,
-    } = expense;
-    const expenseDTO: Expense = {
-      id,
-      date,
-      amount,
-      donationCategory: donationCategoryMapper(
-        [expense.donation_category],
-        true,
-      )[0],
-      expenseCategory: expenseCategoryMapper(
-        [expense.expense_category],
-        true,
-      )[0],
-      status,
-      paymentType,
-      comment,
-      project,
-      user: userMapper([user], true)[0],
-      beneficiary: beneficiaryMapper([beneficiary], true)[0],
-    };
-    return expenseDTO;
-  });
-  return expenseDTOs;
-};
 
 export default Expense;
