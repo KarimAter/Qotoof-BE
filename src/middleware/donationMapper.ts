@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { IDonation } from '../models/interfaces';
-import { donationMapper } from '../models/donation';
+import { arrayMapper } from '../utils/helperFunctions';
 
 const donationMapperMiddleware = (
   req: Request,
@@ -8,11 +8,7 @@ const donationMapperMiddleware = (
   next: NextFunction,
 ) => {
   const donationEntity: IDonation[] | IDonation = req.body;
-  return res.json(
-    donationMapper(
-      Array.isArray(donationEntity) ? donationEntity : [donationEntity],
-    ),
-  );
+  return res.json(arrayMapper(donationEntity));
 };
 
 export default donationMapperMiddleware;

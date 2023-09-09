@@ -1,29 +1,28 @@
-import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
+import { NextFunction, Request, Response } from 'express';
 import prismaClient from '../utils/databaseConnector';
 import prismaOperation from '../utils/helperFunctions';
 import ValidationError from '../middleware/Errors/InvalidRequestError';
-import { DonationCategory } from '../models/donationCategory';
+import { IStatus } from '../models/interfaces';
 
-const getDonationCategories = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+const getStatuses = async (req: Request, res: Response, next: NextFunction) => {
   const result = await prismaOperation(
-    () => prismaClient.donationCategory.findMany(),
+    () =>
+      prismaClient.status.findMany({
+        select: {
+          id: true,
+          name: true,
+        },
+      }),
     res,
     next,
   );
+
   req.body = result;
   next();
 };
 
-const getDonationCategory = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+const getStatus = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   const { id } = req.params;
   try {
@@ -33,8 +32,12 @@ const getDonationCategory = async (
 
     const result = await prismaOperation(
       () =>
-        prismaClient.donationCategory.findUnique({
-          where: { id: Number(id) },
+        prismaClient.status.findUnique({
+          where: { id },
+          select: {
+            id: true,
+            name: true,
+          },
         }),
       res,
       next,
@@ -46,21 +49,17 @@ const getDonationCategory = async (
   }
 };
 
-const postDonationCategory = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+const postStatus = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
-  const { name, carryover } = req.body as DonationCategory;
+  const { name } = req.body as IStatus;
   try {
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);
     }
     const result = await prismaOperation(
       () =>
-        prismaClient.donationCategory.create({
-          data: { name, carryover },
+        prismaClient.status.create({
+          data: { name },
         }),
       res,
       next,
@@ -72,14 +71,10 @@ const postDonationCategory = async (
   }
 };
 
-const editDonationCategory = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+const editStatus = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+  const { name } = req.body as IStatus;
   const errors = validationResult(req);
-
-  const { id, name, carryover } = req.body as DonationCategory;
   try {
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);
@@ -87,9 +82,9 @@ const editDonationCategory = async (
 
     const result = await prismaOperation(
       () =>
-        prismaClient.donationCategory.update({
-          where: { id: Number(id) },
-          data: { name, carryover },
+        prismaClient.status.update({
+          where: { id },
+          data: { name },
         }),
       res,
       next,
@@ -101,7 +96,7 @@ const editDonationCategory = async (
   }
 };
 
-const deleteDonationCategory = async (
+const deleteStatus = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -115,8 +110,8 @@ const deleteDonationCategory = async (
 
     const result = await prismaOperation(
       () =>
-        prismaClient.donationCategory.delete({
-          where: { id: Number(id) },
+        prismaClient.status.delete({
+          where: { id },
         }),
       res,
       next,
@@ -128,10 +123,4 @@ const deleteDonationCategory = async (
   }
 };
 
-export {
-  getDonationCategories,
-  getDonationCategory,
-  postDonationCategory,
-  editDonationCategory,
-  deleteDonationCategory,
-};
+export { getStatuses, getStatus, postStatus, editStatus, deleteStatus };

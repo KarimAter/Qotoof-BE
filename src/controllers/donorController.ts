@@ -16,16 +16,17 @@ const postDonor = async (req: Request, res: Response, next: NextFunction) => {
 
     const result = await prismaOperation(
       () =>
-        prismaClient.donor.create({
-          data: {
-            short_name: shortName,
-            first_name: firstName,
-            last_name: lastName,
-            full_name: fullName,
-            referral_id: referral.id,
-          },
-          include: { referral: true },
-        }),
+        // prismaClient.$queryRaw`SELECT * FROM "donor" WHERE "shortName" = '${shortName}`,
+      prismaClient.donor.create({
+        data: {
+          shortName,
+          firstName,
+          lastName,
+          fullName,
+          referralId: referral.id,
+        },
+        include: { referral: { select: { shortName: true } } },
+      }),
       res,
       next,
     );
@@ -41,8 +42,7 @@ const getDonors = async (req: Request, res: Response, next: NextFunction) => {
   const result = await prismaOperation(
     () =>
       prismaClient.donor.findMany({
-        // include: { referral: { select: { short_name: true } } },
-        include: { referral: true },
+        include: { referral: { select: { shortName: true } } },
       }),
     res,
     next,
@@ -59,7 +59,11 @@ const getDonor = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const result = await prismaOperation(
-      () => prismaClient.donor.findUnique({ where: { id: Number(id) } }),
+      () =>
+        prismaClient.donor.findUnique({
+          where: { id },
+          include: { referral: { select: { shortName: true } } },
+        }),
       res,
       next,
     );
@@ -81,7 +85,8 @@ const deleteDonor = async (req: Request, res: Response, next: NextFunction) => {
     const result = await prismaOperation(
       () =>
         prismaClient.donor.delete({
-          where: { id: Number(id) },
+          where: { id },
+          include: { referral: { select: { shortName: true } } },
         }),
       res,
       next,
@@ -95,8 +100,9 @@ const deleteDonor = async (req: Request, res: Response, next: NextFunction) => {
 
 const editDonor = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
+  const { id } = req.params;
 
-  const { id, shortName, referral } = req.body as Donor;
+  const { shortName, firstName, lastName, fullName, referral } = req.body as Donor;
   try {
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);
@@ -105,8 +111,15 @@ const editDonor = async (req: Request, res: Response, next: NextFunction) => {
     const result = await prismaOperation(
       () =>
         prismaClient.donor.update({
-          where: { id: Number(id) },
-          data: { short_name: shortName, referral_id: referral.id },
+          where: { id },
+          data: {
+            shortName,
+            firstName,
+            lastName,
+            fullName,
+            referralId: referral.id,
+          },
+          include: { referral: { select: { shortName: true } } },
         }),
       res,
       next,

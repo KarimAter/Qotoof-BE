@@ -34,24 +34,19 @@ const beneficiaryValidation = (): ValidationChain[] => [
   ]),
   validateOptionalString('address', 'Address'),
 ];
-benRouter.options('/', (req, res) => {
-  // Set the necessary CORS headers for the OPTIONS request
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader(
-    'Access-Control-Allow-Methods',
-    'OPTIONS, GET, POST, PUT, DELETE',
-  );
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.sendStatus(200);
-});
 benRouter.use(isAuthenticated);
 
 benRouter
-  .get('/:id', validateId('Beneficiary'), getBeneficiary)
+  // .get('/:id', validateId('Beneficiary'), getBeneficiary)
+  // .get('/', getBeneficiaries)
+  // .post('/', beneficiaryValidation(), postBeneficiary)
+  // .put('/', beneficiaryValidation(), editBeneficiary)
+  // .delete('/:id', validateId('Beneficiary'), deleteBeneficiary);
+  .post('/', postBeneficiary)
   .get('/', getBeneficiaries)
-  .post('/', beneficiaryValidation(), postBeneficiary)
-  .put('/', beneficiaryValidation(), editBeneficiary)
-  .delete('/:id', validateId('Beneficiary'), deleteBeneficiary);
+  .get('/:id', getBeneficiary)
+  .put('/:id', editBeneficiary)
+  .delete('/:id', deleteBeneficiary);
 
 benRouter.use(beneficiaryMapperMiddleware);
 

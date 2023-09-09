@@ -13,7 +13,9 @@ const postUser = async (req: Request, res: Response, next: NextFunction) => {
   if (!errors.isEmpty()) {
     next(errors.array());
   } else {
-    const { shortName, firstName, lastName, fullName, email, password, role } = req.body as User;
+    const { shortName, firstName, lastName, fullName, email, password, role } = req.body as IUser;
+
+    //  TODO: IUser shall be changed to User
 
     if (password) {
       try {
@@ -22,10 +24,10 @@ const postUser = async (req: Request, res: Response, next: NextFunction) => {
           () =>
             prismaClient.user.create({
               data: {
-                short_name: shortName,
-                first_name: firstName,
-                last_name: lastName,
-                full_name: fullName,
+                shortName,
+                firstName,
+                lastName,
+                fullName,
                 email,
                 role: userRoleMapper(role),
                 password: hashedPassword,
@@ -51,7 +53,7 @@ const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   const result = await prismaOperation(
     () =>
       prismaClient.user.findMany({
-        select: { id: true, short_name: true, email: true, role: true },
+        select: { id: true, shortName: true, email: true, role: true },
       }),
     res,
     next,
@@ -93,7 +95,7 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
           role: loadedUser?.role,
         },
         'secret',
-        { expiresIn: '1h' },
+        { expiresIn: '3h' },
       );
 
       res.json({
@@ -101,13 +103,12 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
         token,
         user: {
           id: loadedUser?.id,
-          shortName: loadedUser?.short_name,
+          shortName: loadedUser?.shortName,
           role: loadedUser?.role,
         },
       });
     })
     .catch((error) => next(error));
-  // }
 };
 
 export { postUser, getUsers, getUser };

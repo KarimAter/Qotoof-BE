@@ -1,27 +1,57 @@
-import { validationResult } from 'express-validator';
 import { NextFunction, Request, Response } from 'express';
-import { ICategory } from '../models/Category';
+import { validationResult } from 'express-validator';
 import prismaClient from '../utils/databaseConnector';
 import prismaOperation from '../utils/helperFunctions';
 import ValidationError from '../middleware/Errors/InvalidRequestError';
-import { ExpenseCategory } from '../models/expenseCategory';
+import { PaymentContainer } from '../models/paymentContainer';
 
-const getExpenseCategories = async (
+const postPaymentContainer = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const errors = validationResult(req);
+
+  const { name } = req.body as PaymentContainer;
+  try {
+    if (!errors.isEmpty()) {
+      throw new ValidationError('Invalid input', errors);
+    }
+
+    const result = await prismaOperation(
+      () =>
+        prismaClient.paymentContainer.create({
+          data: {
+            name,
+          },
+        }),
+      res,
+      next,
+    );
+    req.body = result;
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getPaymentContainers = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const result = await prismaOperation(
-    () => prismaClient.expenseCategory.findMany(),
+    () =>
+      prismaClient.paymentContainer.findMany({
+        include: { Donation: false, Expense: false },
+      }),
     res,
     next,
   );
-
   req.body = result;
   next();
 };
-
-const getExpenseCategory = async (
+const getPaymentContainer = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -32,12 +62,8 @@ const getExpenseCategory = async (
     if (!errors.isEmpty()) {
       throw new ValidationError('Invalid input', errors);
     }
-
     const result = await prismaOperation(
-      () =>
-        prismaClient.expenseCategory.findUnique({
-          where: { id: Number(id) },
-        }),
+      () => prismaClient.paymentContainer.findUnique({ where: { id } }),
       res,
       next,
     );
@@ -48,62 +74,7 @@ const getExpenseCategory = async (
   }
 };
 
-const postExpenseCategory = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const errors = validationResult(req);
-  const { name, carryover } = req.body as ExpenseCategory;
-  try {
-    if (!errors.isEmpty()) {
-      throw new ValidationError('Invalid input', errors);
-    }
-    const result = await prismaOperation(
-      () =>
-        prismaClient.expenseCategory.create({
-          data: { name, carryover },
-        }),
-      res,
-      next,
-    );
-    req.body = result;
-    next();
-  } catch (error) {
-    next(error);
-  }
-};
-
-const editExpenseCategory = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const errors = validationResult(req);
-
-  const { id, name, carryover } = req.body as ExpenseCategory;
-  try {
-    if (!errors.isEmpty()) {
-      throw new ValidationError('Invalid input', errors);
-    }
-
-    const result = await prismaOperation(
-      () =>
-        prismaClient.expenseCategory.update({
-          where: { id: Number(id) },
-          data: { name, carryover },
-        }),
-      res,
-      next,
-    );
-    req.body = result;
-    next();
-  } catch (error) {
-    next(error);
-  }
-};
-
-const deleteExpenseCategory = async (
+const deletePaymentContainer = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -117,8 +88,40 @@ const deleteExpenseCategory = async (
 
     const result = await prismaOperation(
       () =>
-        prismaClient.expenseCategory.delete({
-          where: { id: Number(id) },
+        prismaClient.paymentContainer.delete({
+          where: { id },
+        }),
+      res,
+      next,
+    );
+    req.body = result;
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+const editPaymentContainer = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const errors = validationResult(req);
+  const { id } = req.params;
+
+  const { name } = req.body as PaymentContainer;
+  try {
+    if (!errors.isEmpty()) {
+      throw new ValidationError('Invalid input', errors);
+    }
+
+    const result = await prismaOperation(
+      () =>
+        prismaClient.paymentContainer.update({
+          where: { id },
+          data: {
+            name,
+          },
         }),
       res,
       next,
@@ -131,9 +134,9 @@ const deleteExpenseCategory = async (
 };
 
 export {
-  getExpenseCategories,
-  getExpenseCategory,
-  postExpenseCategory,
-  editExpenseCategory,
-  deleteExpenseCategory,
+  postPaymentContainer,
+  getPaymentContainers,
+  getPaymentContainer,
+  deletePaymentContainer,
+  editPaymentContainer,
 };

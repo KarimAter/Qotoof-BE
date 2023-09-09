@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { referralMapper } from '../models/referral';
 import { IReferral } from '../models/interfaces';
+import { arrayMapper } from '../utils/helperFunctions';
 
 const referralMapperMiddleware = (
   req: Request,
@@ -10,9 +10,7 @@ const referralMapperMiddleware = (
   const referralEntity: IReferral[] | IReferral = req.body;
 
   return res.json(
-    referralMapper(
-      Array.isArray(referralEntity) ? referralEntity : [referralEntity],
-    ),
+    arrayMapper(referralEntity),
   );
 };
 

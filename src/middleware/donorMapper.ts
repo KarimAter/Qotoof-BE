@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { IDonor } from '../models/interfaces';
-import { donorMapper } from '../models/donor';
+import { arrayMapper } from '../utils/helperFunctions';
 
 const donorMapperMiddleware = (
   req: Request,
@@ -9,7 +9,7 @@ const donorMapperMiddleware = (
 ) => {
   const donorEntity: IDonor[] | IDonor = req.body;
   return res.json(
-    donorMapper(Array.isArray(donorEntity) ? donorEntity : [donorEntity]),
+    arrayMapper(donorEntity),
   );
 };
 

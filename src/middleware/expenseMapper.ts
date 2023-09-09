@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { IExpense } from '../models/interfaces';
-import { expenseMapper } from '../models/expense';
+import { arrayMapper } from '../utils/helperFunctions';
 
 const expenseMapperMiddleware = (
   req: Request,
@@ -9,9 +9,7 @@ const expenseMapperMiddleware = (
 ) => {
   const expenseEntity: IExpense[] | IExpense = req.body;
   return res.json(
-    expenseMapper(
-      Array.isArray(expenseEntity) ? expenseEntity : [expenseEntity],
-    ),
+    arrayMapper(expenseEntity),
   );
 };
 
